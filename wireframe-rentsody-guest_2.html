@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wireframe Rentsody Guest</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:Helvetica,Arial,sans-serif;}
+  body{background:#e8e8e8;color:#222;}
+  .app{display:flex;min-height:100vh;}
+
+  /* ===== Panel de control ===== */
+  .panel{width:300px;background:#fff;border-right:1px solid #d5d5d5;padding:24px 20px;flex-shrink:0;}
+  .wmark{border:1.5px dashed #222;border-radius:10px;padding:10px 12px;font-size:11px;font-weight:bold;letter-spacing:.12em;text-transform:uppercase;margin-bottom:22px;text-align:center;line-height:1.6;}
+  .panel h2{font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin:22px 0 10px;color:#888;}
+  .opt{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+  .opt button{border:1.5px solid #222;border-radius:8px;background:#fff;padding:7px 12px;font-size:12px;cursor:pointer;}
+  .opt button.on{background:#222;color:#fff;}
+  .opt button:disabled{opacity:.35;cursor:not-allowed;}
+  .idx{list-style:none;}
+  .idx li{font-size:12.5px;padding:6px 9px;cursor:pointer;border-radius:7px;margin-bottom:1px;}
+  .idx li:hover{background:#f0f0f0;}
+  .idx li.on{background:#222;color:#fff;}
+  .idx .grp{font-weight:bold;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding-top:10px;border-bottom:none;cursor:default;}
+  .idx .grp:hover{background:none;}
+  .note{font-size:11px;color:#666;line-height:1.5;margin-top:14px;border-top:1px solid #ccc;padding-top:10px;}
+
+  /* ===== Teléfono ===== */
+  .stage{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:30px 20px;gap:28px;flex-wrap:wrap;}
+  .frlabel{font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;text-align:center;border:1.5px solid #222;background:#fff;padding:4px 0;}
+  .phone{width:400px;background:#fff;border:2.5px solid #1c1c1c;border-radius:30px;overflow:hidden;display:flex;flex-direction:column;height:850px;box-shadow:0 24px 48px rgba(0,0,0,.10);}
+  .brandbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #ddd;flex-shrink:0;}
+  .logo{border:1.5px dashed #222;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:bold;letter-spacing:.03em;}
+  .pwd{font-size:10px;color:#666;}
+  .screen{flex:1;overflow-y:auto;padding:20px 18px 30px;position:relative;}
+  .modal{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .modal[hidden]{display:none;}
+  .mback{position:absolute;inset:0;background:rgba(0,0,0,.35);}
+  .mbox{position:relative;background:#fff;border:1.5px solid #222;border-radius:14px;padding:16px;width:100%;max-width:330px;box-shadow:0 12px 32px rgba(0,0,0,.25);}
+  .sheet{position:absolute;inset:0;z-index:60;display:flex;flex-direction:column;justify-content:flex-end;}
+  .sbody{position:relative;background:#fff;border:1.5px solid #222;border-bottom:none;border-radius:16px 16px 0 0;padding:10px 16px 18px;box-shadow:0 -8px 24px rgba(0,0,0,.18);}
+  .shandle{width:44px;height:4px;background:#ccc;border-radius:2px;margin:0 auto 12px;}
+  .shrow{display:flex;gap:6px;justify-content:space-between;margin-top:14px;}
+  .shopt{flex:1;text-align:center;font-size:10.5px;color:#444;cursor:pointer;}
+  .shico{width:50px;height:50px;border:1.5px solid #222;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 6px;filter:grayscale(1);background:#fff;}
+  .sarr{position:absolute;top:50%;transform:translateY(-50%);left:8px;width:28px;height:28px;border:1.5px solid #222;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;z-index:2;}
+  .sarr.r{left:auto;right:8px;}
+  .sdots{display:flex;gap:6px;justify-content:center;margin-top:8px;}
+  .sdots i{width:7px;height:7px;border:1.5px solid #222;border-radius:50%;background:#fff;}
+  .sdots i.on{background:#222;}
+  .tabbar{display:flex;border-top:1px solid #ddd;flex-shrink:0;background:#fff;}
+  .tabbar div{flex:1;text-align:center;padding:11px 4px 12px;font-size:10.5px;cursor:pointer;color:#888;}
+  .tabbar div.on{color:#111;font-weight:bold;}
+  .tabbar .ico{display:block;width:20px;height:20px;border:1.5px solid currentColor;border-radius:6px;margin:0 auto 4px;}
+
+  /* ===== Componentes wireframe ===== */
+  h1.s{font-size:19px;margin:2px 0 6px;letter-spacing:-.01em;}
+  p.d{font-size:12.5px;color:#777;margin-bottom:18px;line-height:1.55;}
+  .img{border:1px solid #c9c9c9;border-radius:10px;background:
+    linear-gradient(to top right,transparent calc(50% - 1px),#999 calc(50% - 1px),#999 calc(50% + 1px),transparent calc(50% + 1px)),
+    linear-gradient(to top left,transparent calc(50% - 1px),#999 calc(50% - 1px),#999 calc(50% + 1px),transparent calc(50% + 1px)),#f5f5f5;
+    display:flex;align-items:center;justify-content:center;font-size:10px;color:#666;margin-bottom:12px;}
+  .card{border:1px solid #cfcfcf;border-radius:12px;padding:14px 16px;margin-bottom:12px;background:#fff;position:relative;}
+  .chip.tr{position:absolute;top:12px;right:14px;max-width:48%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .card h3{font-size:13.5px;margin-bottom:6px;}
+  .card p{font-size:12.5px;color:#555;line-height:1.5;margin-bottom:4px;}
+  .card p:last-child{margin-bottom:0;}
+  .cta{display:block;width:100%;border:2px solid #222;border-radius:10px;background:#222;color:#fff;text-align:center;padding:13px;font-size:13.5px;font-weight:bold;cursor:pointer;margin:12px 0;}
+  .cta.dis{background:#e9e9e9;border-color:#d0d0d0;color:#9a9a9a;cursor:default;}
+  .btn2{display:block;width:100%;border:1.5px solid #222;border-radius:10px;background:#fff;color:#222;text-align:center;padding:12px;font-size:13px;font-weight:600;cursor:pointer;margin:10px 0;}
+  .card .btn2{display:inline-block;width:auto;padding:9px 16px;font-size:12.5px;margin:8px 8px 2px 0;}
+  .lnk{font-size:12px;text-decoration:underline;text-underline-offset:2px;cursor:pointer;display:inline-block;margin-top:6px;}
+  .chip{display:inline-block;border:1px solid #555;border-radius:999px;padding:3px 10px;font-size:10.5px;font-weight:bold;background:#fff;}
+  .chip.fill{background:#222;border-color:#222;color:#fff;}
+  .chip.soft{border-style:dashed;color:#777;}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #ececec;font-size:13px;}
+  .row:first-child{padding-top:2px;}
+  .row:last-child{border-bottom:none;padding-bottom:2px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:10.5px;font-weight:bold;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;color:#666;}
+  .field .in{border:1px solid #b8b8b8;border-radius:9px;height:42px;background:#fff;display:flex;align-items:center;padding:0 12px;font-size:12.5px;color:#999;}
+  .bar{border:1px solid #999;border-radius:999px;height:12px;background:#fff;position:relative;margin:8px 0 4px;overflow:hidden;}
+  .bar i{position:absolute;left:0;top:0;bottom:0;background:repeating-linear-gradient(45deg,#222,#222 4px,#555 4px,#555 8px);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .tile{border:1.5px solid #222;border-radius:12px;padding:16px 10px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;background:#fff;}
+  .tile .ico{display:block;width:24px;height:24px;border:1.5px solid #222;border-radius:7px;margin:0 auto 8px;}
+  .tile.on{background:#222;color:#fff;}
+  .tile.on .ico{border-color:#fff;}
+  .banner{border:1.5px dashed #999;border-radius:12px;background:#f7f7f7;padding:12px 14px;font-size:12.5px;margin-bottom:12px;line-height:1.5;}
+  .warn{border:1.5px solid #222;border-radius:12px;background:#f0f0f0;padding:12px 14px;font-size:12.5px;margin-bottom:14px;line-height:1.5;font-weight:bold;}
+  .stars{font-size:22px;letter-spacing:8px;color:#222;margin:8px 0 4px;}
+  .bk{font-size:12px;color:#666;text-decoration:none;cursor:pointer;display:inline-block;margin-bottom:14px;}
+  .bk:hover{text-decoration:underline;}
+  .switch{width:44px;height:24px;border:2px solid #222;border-radius:999px;position:relative;cursor:pointer;flex-shrink:0;}
+  .switch i{position:absolute;top:1px;width:16px;height:16px;background:#222;border-radius:50%;left:2px;}
+  .switch.on i{left:auto;right:2px;}
+  .switch.on{background:#ccc;}
+  .stepper{display:flex;align-items:center;gap:10px;}
+  .stepper button{width:32px;height:32px;border:1.5px solid #222;border-radius:9px;background:#fff;font-size:15px;cursor:pointer;}
+  .chat{border:1px solid #cfcfcf;border-radius:12px;padding:12px;min-height:180px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px;background:#fafafa;}
+  .bub{max-width:82%;border:1px solid #aaa;border-radius:12px;padding:8px 12px;font-size:12.5px;line-height:1.45;background:#fff;}
+  .bub.me{align-self:flex-end;background:#e9e9e9;border-color:#bbb;}
+  .lang{border:1px solid #999;border-radius:7px;padding:3px 9px;font-size:10.5px;cursor:pointer;background:#fff;color:#444;}
+  .pby{text-align:center;font-size:10px;color:#aaa;padding:26px 0 10px;letter-spacing:.04em;}
+  .paycard{border:1px solid #cfcfcf;border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer;background:#fff;}
+  .paycard.on{border:1.5px solid #222;background:#f7f7f7;}
+  .paycard .ptop{display:flex;align-items:center;gap:10px;}
+  .paycard .box{font-size:16px;line-height:1;}
+  .paycard b{flex:1;font-size:13.5px;}
+  .paycard .plogo{border:1px dashed #999;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#666;white-space:nowrap;}
+  .paycard p{font-size:12px;color:#666;margin:6px 0 0 26px;}
+  .orb{width:150px;height:150px;border:2.5px solid #222;border-radius:50%;margin:30px auto 8px;display:flex;align-items:center;justify-content:center;font-size:12.5px;color:#555;cursor:pointer;position:relative;}
+  .orb::after{content:"";position:absolute;inset:12px;border:1.5px dashed #bbb;border-radius:50%;}
+  .bell{position:relative;width:26px;height:26px;border:1px solid #999;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;filter:grayscale(1);background:#fff;}
+  .bell i{position:absolute;top:-4px;right:-4px;width:9px;height:9px;background:#222;border-radius:50%;border:1.5px solid #fff;}
+  .notif{border:1px solid #cfcfcf;border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#fff;cursor:pointer;}
+  .notif.new{border-color:#222;border-width:1.5px;}
+  .notif small{display:block;color:#999;font-size:10.5px;margin-bottom:3px;}
+  .notif p{font-size:12.5px;line-height:1.45;}
+  .notif.new p{font-weight:600;}
+  .info{display:inline-flex;width:16px;height:16px;border:1.5px solid currentColor;border-radius:50%;font-size:10px;font-style:italic;font-weight:bold;align-items:center;justify-content:center;margin-left:8px;vertical-align:middle;cursor:pointer;}
+  .devnote{border:1.5px dashed #999;border-radius:10px;background:#f7f7f7;padding:10px 12px;font-size:11.5px;color:#555;margin:8px 0 10px;line-height:1.5;text-align:left;}
+  .fam{font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.06em;color:#666;margin:14px 0 6px;}
+  .track{display:flex;align-items:flex-start;margin:10px 0 4px;}
+  .tstep{flex:1;text-align:center;position:relative;font-size:10px;color:#666;}
+  .tstep .td{width:16px;height:16px;border:2px solid #222;border-radius:50%;background:#fff;margin:0 auto 4px;position:relative;z-index:1;}
+  .tstep.done .td{background:#222;}
+  .tstep.now .td{background:repeating-linear-gradient(45deg,#222,#222 3px,#fff 3px,#fff 6px);}
+  .tstep:not(:first-child)::before{content:"";position:absolute;top:8px;left:-50%;width:100%;height:2px;background:#222;}
+  .tstep.now,.tstep.done{color:#222;font-weight:bold;}
+
+  /* ===== Vista escritorio ===== */
+  .phone.desktop{width:920px;max-width:96vw;height:850px;border-radius:10px;}
+  .desktop .tabbar{display:none;}
+  .desktop .screen{padding:0;display:flex;}
+  .sidenav{width:215px;border-right:1px solid #ddd;padding:16px 0;flex-shrink:0;overflow-y:auto;background:#fafafa;}
+  .sidenav .sn{padding:10px 18px;font-size:12.5px;cursor:pointer;border-left:3px solid transparent;}
+  .sidenav .sn:hover{background:#f0f0f0;}
+  .sidenav .sn.on{border-left-color:#222;font-weight:bold;background:#eee;}
+  .sidenav .snh{padding:12px 16px 4px;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.08em;color:#888;}
+  .dcontent{flex:1;overflow-y:auto;padding:22px 30px;}
+  .dcontent .inner{max-width:720px;}
+  .desktop .grid2{grid-template-columns:repeat(4,1fr);}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="panel">
+    <div class="wmark">Wireframe · baja fidelidad<br>Rentsody Guest</div>
+
+    <h2>Simular estado</h2>
+    <div style="font-size:11px;color:#666;margin-bottom:4px;">Punto de entrada</div>
+    <div class="opt" id="opt-cuenta"><button data-v="0">Enlace del gestor</button><button data-v="1">Login con cuenta</button></div>
+    <div style="font-size:11px;color:#666;margin-bottom:4px;">Origen de la reserva</div>
+    <div class="opt" id="opt-origen"><button data-v="ota">OTA</button><button data-v="dir">Directa / red</button></div>
+    <div style="font-size:11px;color:#666;margin-bottom:4px;">Momento del viaje</div>
+    <div class="opt" id="opt-momento">
+      <button data-v="pre">Antes</button><button data-v="est">Durante</button><button data-v="out">Salida</button>
+    </div>
+    <div style="font-size:11px;color:#666;margin-bottom:4px;">Rentsody One</div>
+    <div class="opt" id="opt-one"><button data-v="1">Con One</button><button data-v="0">Sin One</button></div>
+    <div style="font-size:11px;color:#666;margin-bottom:4px;">Estancia activa</div>
+    <div class="opt" id="opt-estancia"><button data-v="1">Con estancia</button><button data-v="0">Sin estancia</button></div>
+
+    <h2>Pantallas</h2>
+    <ul class="idx" id="idx"></ul>
+
+    <div class="note"><b>Dos flujos, dos marcas.</b> Sin cuenta (flujo del enlace): solo la estancia, con el logo del gestor y sin apartados de cuenta. Con cuenta: la app completa Rentsody Guest, con su propio logo, buscador y Mis viajes. Cambia "Cuenta Rentsody" arriba para verlo.</div>
+  </div>
+
+  <div class="stage">
+    <div>
+      <div class="frlabel">M&oacute;vil</div>
+      <div class="phone">
+        <div class="brandbar">
+          <span class="logo">LOGO GESTOR</span>
+          <span class="pwd">powered by <b>Rentsody</b></span>
+        </div>
+        <div class="screen" id="screen"></div>
+        <div class="tabbar" id="tabbar"></div>
+      </div>
+    </div>
+    <div>
+      <div class="frlabel">Escritorio</div>
+      <div class="phone desktop" id="deskframe">
+        <div class="brandbar">
+          <span class="logo">LOGO GESTOR</span>
+          <span class="pwd">powered by <b>Rentsody</b></span>
+        </div>
+        <div class="screen" id="dscreen"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var S = {screen:'home', momento:'pre', one:true, cuenta:false, origen:'ota', modo:'inst', doc:'es', det:'', prev:'home', estancia:true, ctx:'', buscado:false, servtab:'sol', who:'', inv:{}, share:null, gal:-1};
+var NEUTRAL = ['login','misviajes','viaje','perfil','confianza','buscador','ficha','galeria','pago','solicitada','confirmada'];
+
+/* ---------- helpers ---------- */
+function img(h,label){return '<div class="img" style="height:'+h+'px">'+(label||'imagen')+'</div>';}
+function cta(t,go){return '<div class="cta" onclick="go(\''+go+'\')">'+t+'</div>';}
+function btn2(t,go){return '<div class="btn2" onclick="go(\''+go+'\')">'+t+'</div>';}
+function back(t,go){return '<span class="bk" onclick="go(\''+go+'\')">&larr; '+t+'</span>';}
+function field(l,ph){return '<div class="field"><label>'+l+'</label><div class="in">'+(ph||'')+'</div></div>';}
+function cardPend(nombre,id){
+  if(S.inv[id]){
+    return '<div class="card"><span class="chip soft tr">Invitado</span><h3>'+nombre+'</h3>'
+      +'<p>Invitaci&oacute;n enviada por '+(S.inv[id]==='wa'?'WhatsApp':'email')+'. Cuando complete sus datos, su registro aparecer&aacute; aqu&iacute;.</p>'
+      +'<div class="btn2" onclick="openShare(\'re\',\''+id+'\',\''+nombre+'\')">Reenviar enlace</div>'
+      +'<div class="btn2" onclick="S.who=\''+nombre+'\';go(\'ckform\')">A&ntilde;adir datos</div></div>';
+  }
+  return '<div class="card"><span class="chip soft tr">Pendiente</span><h3>'+nombre+'</h3>'
+    +'<p>Pendiente de registro. Env&iacute;a una invitaci&oacute;n o introduce sus datos.</p>'
+    +'<div class="btn2" onclick="openShare(\'inv\',\''+id+'\',\''+nombre+'\')">Invitar</div>'
+    +'<div class="btn2" onclick="S.who=\''+nombre+'\';go(\'ckform\')">A&ntilde;adir datos</div></div>';
+}
+function shareSheet(){
+  if(!S.share) return '';
+  var s=S.share;
+  var tit = s.mode==='inv' ? 'Invitar a '+s.nombre : 'Reenviar enlace a '+s.nombre;
+  return '<div class="sheet">'
+    +'<div class="mback" onclick="closeShare()"></div>'
+    +'<div class="sbody">'
+    +'<div class="shandle"></div>'
+    +'<h3 style="font-size:14px;">'+tit+'</h3>'
+    +'<p style="font-size:11.5px;color:#666;margin-top:4px;">Recibir&aacute; un enlace para completar y firmar su propio registro.</p>'
+    +'<div class="shrow">'
+    +'<div class="shopt" onclick="shareVia(this,\'wa\')"><div class="shico">&#128172;</div>WhatsApp</div>'
+    +'<div class="shopt" onclick="shareVia(this,\'em\')"><div class="shico">&#9993;</div>Email</div>'
+    +'<div class="shopt" onclick="copShare(this)"><div class="shico">&#128279;</div><span class="lbl">Copiar enlace</span></div>'
+    +'<div class="shopt" title="Abre el men&uacute; de compartir del tel&eacute;fono"><div class="shico">&#8943;</div>M&aacute;s opciones</div>'
+    +'</div>'
+    +'<span class="lnk" style="display:block;text-align:center;margin-top:14px;" onclick="closeShare()">Cancelar</span>'
+    +'</div></div>';
+}
+function openShare(mode,id,nombre){S.share={mode:mode,id:id,nombre:nombre};render();}
+function closeShare(){S.share=null;render();}
+function shareVia(el,ch){
+  var s=S.share; if(!s) return;
+  if(s.mode==='inv'){ S.inv[s.id]=ch; S.share=null; render(); return; }
+  el.closest('.sbody').innerHTML='<p style="text-align:center;padding:18px 0;font-size:13px;">Enlace reenviado por '+(ch==='wa'?'WhatsApp':'email')+' &#10003;</p>';
+  setTimeout(function(){S.share=null;render();},1600);
+}
+function copShare(el){var l=el.querySelector('.lbl');if(l){l.innerHTML='Copiado &#10003;';setTimeout(function(){l.innerHTML='Copiar enlace';},2000);}}
+
+/* ---------- pantallas ---------- */
+var SC = {};
+
+SC.home = {t:'Home de la estancia', g:'Mi estancia', f:function(){
+  if(S.cuenta && !S.estancia){
+    return '<h1 class="s">Hola, Alba</h1>'
+      +'<div class="card"><h3>No tienes ninguna estancia activa</h3><p>Cuando reserves, aqu&iacute; aparecer&aacute; tu estancia con su check-in, tu llave y la gu&iacute;a del alojamiento.</p>'+cta('Explorar la red','buscador')+'</div>'
+      +'<div class="card" style="cursor:pointer" onclick="go(\'misviajes\')"><h3>Mis viajes <span style="float:right;color:#999">&rsaquo;</span></h3><p>Consulta tus viajes anteriores y vuelve a reservar</p></div>'
+      +'<div class="card" style="cursor:pointer" onclick="go(\'rewards\')"><h3>Tus Rewards <span style="float:right;color:#999">&rsaquo;</span></h3><p>Tus puntos valen descuentos en reservas directas de la red</p></div>';
+  }
+  var h='';
+  if(S.cuenta && S.estancia){
+    h+='<div class="card" style="display:flex;align-items:center;gap:12px;"><span class="logo">LOGO GESTOR</span><span style="font-size:12.5px;color:#555;">[Alojamiento] &middot; gestionado por [Gestor]</span></div>';
+  }
+  if(!S.cuenta){
+    h+=img(110,'foto del alojamiento')
+      +'<div class="card"><span class="chip fill tr">Confirmada</span><h3>[Nombre del alojamiento]</h3><p>12 &ndash; 16 ago &middot; 4 viajeros</p>'
+      +'<p>Reservada en <span class="chip">'+(S.origen==='ota'?'Airbnb':'la web del gestor')+'</span> &middot; Gestionado por [Gestor]</p></div>';
+  }
+  if(S.momento==='pre'){
+    var sinInv=(S.inv.v3?0:1)+(S.inv.v4?0:1);
+    h+='<div class="banner"><b>Siguiente acci&oacute;n:</b> completar el check-in del grupo. Faltan 3 de 4'
+      +(sinInv===0?': invitaciones enviadas.':(sinInv===1?': 1 viajero sin invitar.':': 2 viajeros sin invitar.'))
+      +'</div>'+cta('Continuar check-in','checkin');
+  } else if(S.momento==='est'){
+    h+='<div class="card"><span class="chip fill tr">Activa</span><h3>Tu llave digital</h3>'
+      +(S.one?'<div class="cta" onclick="abrir(this)">Abrir puerta</div>':'')
+      +'<div class="btn2" style="display:block;width:100%;padding:12px;font-size:13px;margin:10px 0;" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden">Ver c&oacute;digo de acceso</div>'
+      +'<div hidden>'+img(70,'c&oacute;digo de acceso')+'</div></div>';
+  } else {
+    h+='<div class="banner"><b>Check-out ma&ntilde;ana a las 11:00.</b> Revisa las acciones pendientes.</div>'+cta('Preparar salida','checkout');
+  }
+  var titles = {checkin:'Check-in',llegada:'Llegada y acceso',reserva:'Mi reserva',guia:'Gu&iacute;a',vivienda:'Vivienda',agente:'Asistente',servicios:'Servicios',rewards:'Rewards',ayuda:'Ayuda',checkout:'Check-out'};
+  var prev = {
+    checkin: '1 de 4 completados. Contin&uacute;a con tu grupo.',
+    llegada: (S.momento==='pre' ? 'Tu llave: todav&iacute;a no disponible. Se activar&aacute; al completar el check-in.' : (S.momento==='est' ? 'Direcci&oacute;n, wifi e instrucciones de entrada' : 'La llave expira tras el check-out.')),
+    reserva: 'Consulta las fechas, el grupo y los datos de tu reserva',
+    guia: (S.momento==='est' ? 'Normas, equipamiento y recomendaciones de la zona' : 'Todo sobre el alojamiento, listo para cuando llegues'),
+    vivienda: 'Controla las luces, el clima y las persianas del alojamiento',
+    agente: 'Resuelve tus dudas al momento, por chat o por voz',
+    servicios: 'Solicita limpieza, entrada temprana y otros extras',
+    rewards: 'Gana puntos que valen descuentos en pr&oacute;ximas reservas',
+    ayuda: 'Habla con tu gestor o comunica una incidencia',
+    checkout: 'Prepara tu salida y confirma el check-out'
+  };
+  var orden;
+  if(S.momento==='pre'){orden=['llegada','reserva','servicios','guia'];if(S.one)orden.push('vivienda');orden=orden.concat(['rewards','ayuda','checkout']);}
+  else if(S.momento==='est'){orden=['llegada','guia'];if(S.one)orden.push('vivienda');orden=orden.concat(['servicios','rewards','ayuda','reserva','checkout']);}
+  else{orden=['rewards','servicios','ayuda','guia','reserva'];}
+  orden.forEach(function(k){
+    h+='<div class="card" style="cursor:pointer" onclick="go(\''+k+'\')"><h3>'+titles[k]+' <span style="float:right;color:#999">&rsaquo;</span></h3><p>'+prev[k]+'</p></div>';
+  });
+  var tit = S.cuenta ? '<h1 class="s">Hola, Alba</h1>' : '<h1 class="s">Tu estancia</h1>';
+  return tit+'<p class="d">Todo sobre tu estancia, en un solo lugar.</p>'+h;
+}};
+
+SC.reserva = {t:'Mi reserva', g:'Mi estancia', f:function(){
+  return back('Home','home')+'<h1 class="s">Mi reserva</h1><p class="d">Datos de la reserva y del grupo.</p>'
+    +'<div class="card"><span class="chip fill tr">Confirmada</span><h3>[Alojamiento]</h3><p>12 &ndash; 16 ago &middot; 4 noches</p><p>Pago completado</p><p>Canal de reserva: <span class="chip">'+(S.origen==='ota'?'Airbnb':'Web del gestor')+'</span></p></div>'
+    +'<div class="card"><h3>Grupo (4 viajeros)</h3>'
+    +'<div class="row">Alba (titular) <span class="chip fill">Check-in ok</span></div>'
+    +'<div class="row">Dani <span class="chip soft">En progreso</span></div>'
+    +'<div class="row">Viajero 3 (por definir) <span class="chip soft">'+(S.inv.v3?'Invitado':'Sin invitar')+'</span></div>'
+    +'<div class="row">Viajero 4 (por definir) <span class="chip soft">'+(S.inv.v4?'Invitado':'Sin invitar')+'</span></div>'
+    +'<p style="font-size:11.5px;color:#666;margin-top:6px;">Los nombres aparecen cuando invitas a un acompa&ntilde;ante o cuando cada uno completa sus datos.</p></div>';
+}};
+
+SC.checkin = {t:'Check-in del grupo', g:'Mi estancia', f:function(){
+  return back('Home','home')+'<h1 class="s">Check-in online</h1>'
+    +'<p class="d">El registro de viajeros es obligatorio antes de la llegada. Desde aqu&iacute; puedes seguir el progreso del grupo; cada adulto gestiona &uacute;nicamente sus propios datos.</p>'
+    +'<div class="bar"><i style="width:25%"></i></div><p class="d">1 de 4 registros completados</p>'
+    +'<div class="card"><span class="chip fill tr">Completado</span><h3>Alba &middot; titular</h3>'
+    +'<div class="btn2" onclick="S.who=\'\';go(\'ckform\')">Revisar mis datos</div></div>'
+    +'<div class="card"><span class="chip soft tr">En progreso</span><h3>Dani</h3>'
+    +'<p>Ha recibido su enlace y est&aacute; completando sus datos.</p>'
+    +'<div class="btn2" onclick="openShare(\'re\',\'dani\',\'Dani\')">Reenviar enlace</div></div>'
+    +cardPend('Viajero 3','v3')
+    +cardPend('Viajero 4','v4')
+    +'<div class="cta dis" style="margin-top:16px;">Revisar y enviar los registros del grupo</div>'
+    +'<p class="d" style="text-align:center;margin-top:-6px;">Los registros de los cuatro viajeros se env&iacute;an juntos, una sola vez. Se activar&aacute; cuando todos est&eacute;n completos: cada adulto firma su parte al confirmar sus datos.</p>'
+    +'<p class="d" style="margin-top:10px;">El check-in quedar&aacute; completo cuando env&iacute;es los registros y el sistema los confirme. Si el n&uacute;mero de viajeros ha cambiado, <span class="lnk" onclick="go(\'ayuda\')">contacta con el gestor</span>.</p>'
+    +shareSheet();
+}};
+
+SC.ckform = {t:'Formulario de viajero', g:'Mi estancia', f:function(){
+  var ext = S.doc==='ext';
+  var yo = !S.who;
+  return back('Check-in','checkin')+'<h1 class="s">'+(yo?'Mis datos':'Datos de '+S.who)+'</h1>'
+    +'<p class="d">Introduce los datos tal y como aparecen en el documento de identidad. El registro es obligatorio por ley para todos los viajeros.</p>'
+    +'<div class="warn">Un dato necesita correcci&oacute;n: revisa el n&uacute;mero de documento.</div>'
+    +'<div class="field"><label>Tipo de documento</label><div style="display:flex;gap:8px;">'
+    +'<span class="chip '+(!ext?'fill':'')+'" style="cursor:pointer" onclick="set(\'doc\',\'es\')">DNI / NIE</span>'
+    +'<span class="chip '+(ext?'fill':'')+'" style="cursor:pointer" onclick="set(\'doc\',\'ext\')">Pasaporte / doc. de identidad UE</span>'
+    +'</div></div>'
+    +field('Nombre', yo?(ext?'Rebecca':'Alba'):'&mdash;')
+    +(ext?field('Apellidos','El segundo apellido, solo si figura en el documento'):field('Apellidos','&mdash;'))
+    +field('Sexo','&mdash;')+field('Fecha de nacimiento','&mdash;')
+    +field('N&uacute;mero de documento', ext?'N&uacute;mero de pasaporte o documento de identidad':'&mdash;')
+    +(ext?'<p style="font-size:11.5px;color:#666;margin:2px 0 10px;">Fuera de la UE: el pasaporte es el &uacute;nico documento admitido. Si resides en Espa&ntilde;a, usa la opci&oacute;n DNI / NIE.</p>':'')
+    +(ext?'':field('N&uacute;mero de soporte','Figura en tu DNI o NIE'))
+    +field('Nacionalidad', ext?'Reino Unido':'&mdash;')
+    +field('Residencia habitual', ext?'Direcci&oacute;n, localidad y pa&iacute;s (fuera de Espa&ntilde;a)':'Direcci&oacute;n, localidad, pa&iacute;s')
+    +field('Tel&eacute;fono m&oacute;vil', ext?'Con prefijo internacional (+44 ...)':'&mdash;')
+    +field('Correo electr&oacute;nico','&mdash;')
+    +(S.who?'':'<div class="card"><h3>Menores de 14 a&ntilde;os a mi cargo</h3><p>Sus datos los facilita su adulto responsable, aqu&iacute; mismo, y ocupan una plaza del grupo. De 14 a 17 a&ntilde;os completan y firman su propio parte: se les invita como a un adulto.</p>'
+    +'<div class="btn2" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden">A&ntilde;adir menor a mi cargo</div>'
+    +'<div hidden style="margin-top:10px;border-top:1px dashed #bbb;padding-top:10px;">'
+    +field('Nombre del menor','&mdash;')+field('Apellidos','El segundo, solo si figura en su documentaci&oacute;n')
+    +field('Sexo','&mdash;')+field('Fecha de nacimiento','&mdash;')
+    +field('Nacionalidad','&mdash;')
+    +field('Documento (si lo tiene)','Opcional: si dispone de DNI o pasaporte')
+    +field('Parentesco con el menor','Hija / hijo / sobrina / ...')
+    +'<p style="font-size:11.5px;color:#444;">Como adulto responsable, declaro que sus datos son ciertos. Los menores de 14 a&ntilde;os no firman; sin documento, se registran sin &eacute;l.</p>'
+    +'</div></div>')
+    +(yo
+      ? '<p style="font-size:11.5px;color:#444;margin:10px 0;">&#9744; He le&iacute;do la <span class="lnk">pol&iacute;tica de privacidad</span> y acepto el tratamiento de mis datos y de los de los menores a mi cargo para el registro oficial de viajeros. Esta confirmaci&oacute;n equivale a la firma de mi parte de viajeros (obligatoria desde los 14 a&ntilde;os).</p>'
+      : '<p style="font-size:11.5px;color:#444;margin:10px 0;">&#9744; Declaro que cuento con el permiso de esta persona para facilitar sus datos, y que son ciertos. Podr&aacute; revisarlos y firmar su parte antes del env&iacute;o.</p>')
+    +cta('Guardar','checkin')
+    +'<p class="d">Se guarda como borrador, tambi&eacute;n autom&aacute;ticamente si sales del formulario. El env&iacute;o al registro se hace una sola vez, para todo el grupo, desde la pantalla del check-in.</p>';
+}};
+
+SC.llegada = {t:'Llegada y acceso', g:'Mi estancia', f:function(){
+  var cred;
+  if(S.momento==='pre'){cred='<div class="card"><span class="chip soft tr">No disponible</span><h3>Tu llave digital</h3><p>Se activar&aacute; cuando el grupo complete el check-in y quede confirmado el pago.</p>'+btn2('Completar check-in','checkin')+'</div>';}
+  else if(S.momento==='est'){cred='<div class="card"><span class="chip fill tr">Activa</span><h3>Tu llave digital</h3>'
+    +(S.one?'<div class="cta" onclick="abrir(this)">Abrir puerta</div>':'')
+    +'<div class="btn2" style="display:block;width:100%;padding:12px;font-size:13px;margin:10px 0;" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden">Ver c&oacute;digo de acceso</div>'
+    +'<div hidden>'+img(70,'c&oacute;digo de acceso')+'</div>'
+    +'</div>';}
+  else{cred='<div class="card"><span class="chip soft tr">Expira tras el check-out</span><h3>Tu llave digital</h3></div>';}
+  return back('Home','home')+'<h1 class="s">Llegada y acceso</h1>'
+    +'<p class="d">Todo lo que necesitas para llegar y entrar al alojamiento.</p>'
+    +img(110,'mapa')
+    +'<div class="card"><h3>Direcci&oacute;n</h3><p>[Calle, n&uacute;mero, localidad]</p><span class="lnk" onclick="det(\'C&oacute;mo llegar\')">C&oacute;mo llegar</span></div>'
+    +'<div class="card"><h3>Entrada</h3><p>A partir de las 16:00 &middot; Instrucciones del edificio</p></div>'
+    +'<div class="card"><div class="row" style="cursor:pointer" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden">Wifi <span class="lnk">Ver clave</span></div>'
+    +'<div hidden style="padding:6px 0 4px;font-size:12.5px;">Red: <b>MOJACAR_DREAM</b> &middot; Clave: <b>[clave-wifi]</b> <span class="lnk">Copiar</span></div></div>'
+    +(S.one?'<div class="card"><h3>Vivienda conectada</h3><p>Este alojamiento tiene sensores de clima, apertura y nivel de ruido. No graban audio ni im&aacute;genes: miden niveles para cuidar la vivienda. Qu&eacute; miden, qui&eacute;n ve los datos y cu&aacute;nto se conservan: <span class="lnk" onclick="det(\'Sensores de la vivienda\')">m&aacute;s informaci&oacute;n</span>.</p></div>':'')
+    +cred;
+}};
+
+SC.noentra = {t:'No puedo entrar', g:'Mi estancia', f:function(){
+  return back('Ayuda','ayuda')+'<h1 class="s">No puedo entrar</h1>'
+    +'<p class="d">Tranquila, tiene soluci&oacute;n. Prueba la alternativa o llama: te atendemos al momento.</p>'
+    +'<div class="card"><h3>Alternativa</h3><p>Caja de llaves junto a la puerta. C&oacute;digo: [____]</p>'+img(70,'foto de la caja')+'</div>'
+    +cta('Llamar a una persona ahora','ayuda')
+    +'<p class="d">El tel&eacute;fono est&aacute; disponible durante toda tu estancia.</p>';
+}};
+
+SC.vivienda = {t:'Vivienda (panel)', g:'Mi estancia · One', f:function(){
+  if(!S.one) return back('Home','home')+'<div class="banner">Esta vivienda no dispone de Rentsody One. Secci&oacute;n no visible.</div>';
+  return back('Home','home')+'<h1 class="s">Tu vivienda</h1>'
+    +'<p class="d">Ajusta luces, clima y persianas a tu gusto durante la estancia.</p>'
+    +'<div class="warn">La climatizaci&oacute;n est&aacute; en pausa: la ventana del sal&oacute;n est&aacute; abierta.</div>'
+    +'<div class="card"><div class="row">Luces del sal&oacute;n <div class="switch on" onclick="this.classList.toggle(\'on\')"><i></i></div></div>'
+    +'<div class="row">Persianas <div class="switch" onclick="this.classList.toggle(\'on\')"><i></i></div></div>'
+    +'<div class="row">Temperatura <div class="stepper"><button>&minus;</button><b>22&deg;</b><button>+</button></div></div>'
+    +'<p style="font-size:11px;color:#666;padding:2px 0 6px;">Rango permitido en esta vivienda: 19&deg; &ndash; 24&deg;</p>'
+    +'<div class="row">Alarma <div class="switch" onclick="this.classList.toggle(\'on\')"><i></i></div></div>'
+    +'<p style="font-size:11.5px;color:#666;margin:-4px 0 4px;">Apagada mientras est&aacute;is en casa. Act&iacute;vala al salir; se desactiva sola al volver a abrir con tu llave</p></div>'
+    +'<div class="card"><h3>Escenas</h3>'
+    +'<div class="row">Bienvenida <div class="switch on" onclick="this.classList.toggle(\'on\')"><i></i></div></div>'
+    +'<p style="font-size:11.5px;color:#666;margin:-4px 0 8px;">Luces del sal&oacute;n encendidas, 22 grados y persianas subidas</p>'
+    +'<div class="row">Noche <div class="switch" onclick="this.classList.toggle(\'on\')"><i></i></div></div>'
+    +'<p style="font-size:11.5px;color:#666;margin:-4px 0 4px;">Luces apagadas, persianas bajadas y 20 grados hasta la ma&ntilde;ana</p>'
+    +'<p style="font-size:11px;color:#999;margin-top:8px;">Las escenas y lo que hace cada una dependen de la instalaci&oacute;n de esta vivienda</p></div>';
+}};
+
+SC.agente = {t:'Agente de estancia', g:'Mi estancia · One', f:function(){
+  if(!S.one) return back('Ayuda','ayuda')+'<div class="banner">El asistente requiere Rentsody One. Sin One, la ayuda es el canal directo con el gestor.</div>'+btn2('Ir a Ayuda','ayuda');
+  return back('Home','home')+'<h1 class="s">Asistente</h1>'
+    +'<p class="d">Pregunta lo que necesites sobre tu estancia. Te responde al momento y te lleva al apartado adecuado.</p>'
+    +'<div class="chat">'
+    +'<div class="bub me">&iquest;C&oacute;mo entro en el alojamiento?</div>'
+    +'<div class="bub">Tu llave est&aacute; activa. Puedes abrir la puerta o ver el c&oacute;digo desde <span class="lnk" onclick="go(\'llegada\')">Llegada y acceso</span>, y tambi&eacute;n lo tienes en tu <span class="lnk" onclick="go(\'home\')">Inicio</span>.</div>'
+    +'<div class="bub me">&iquest;D&oacute;nde puedo aparcar?</div>'
+    +'<div class="bub">Hay zona libre en la misma calle. Te lo cuenta la <span class="lnk" onclick="det(\'Aparcamiento\')">gu&iacute;a, secci&oacute;n aparcamiento</span>.</div>'
+    +'<div class="bub me">Baja las persianas del sal&oacute;n</div>'
+    +'<div class="bub">Hecho. Persianas del sal&oacute;n bajadas. Puedes ajustarlas en <span class="lnk" onclick="go(\'vivienda\')">Vivienda</span>.</div>'
+    +'</div>'
+    +field('Escribe tu pregunta','')
+    +'<div style="display:flex;gap:10px;">'
+    +'<div class="btn2" style="width:auto;margin:0;padding:12px 16px;white-space:nowrap;" onclick="go(\'voz\')"><span style="filter:grayscale(1);">&#127908;</span> Hablar</div>'
+    +'<div class="cta" style="flex:1;margin:0;">Enviar</div>'
+    +'</div>'
+    +'<p class="d" style="margin-top:10px;">"Hablar" abre una conversaci&oacute;n por voz con el asistente, como una llamada.</p>';
+}};
+
+SC.voz = {t:'Asistente · modo voz', g:'Mi estancia', f:function(){
+  if(!S.one) return back('Ayuda','ayuda')+'<div class="banner">El asistente requiere Rentsody One.</div>';
+  return '<span class="bk" onclick="go(\'agente\')">&larr; Volver al chat</span>'
+    +'<h1 class="s" style="text-align:center;margin-top:10px;">Conversaci&oacute;n por voz</h1>'
+    +'<div class="orb" onclick="var l=this.querySelector(\'span\');l.innerHTML=(l.innerHTML.indexOf(\'Escuchando\')>=0?\'Hablando&hellip;\':\'Escuchando&hellip;\')"><span>Escuchando&hellip;</span></div>'
+    +'<p class="d" style="text-align:center;">Habla con naturalidad; puedes interrumpirle.</p>'
+    +'<div class="card"><p style="color:#999;font-size:11px;margin-bottom:4px;">T&uacute;</p><p>&iquest;A qu&eacute; hora es el check-out?</p>'
+    +'<p style="color:#999;font-size:11px;margin:10px 0 4px;">Asistente</p><p>A las 11:00 de la ma&ntilde;ana. Te lo he dejado tambi&eacute;n en <span class="lnk" onclick="go(\'checkout\')">Check-out</span>.</p></div>'
+    +'<div style="display:flex;gap:10px;margin-top:14px;">'
+    +'<div class="btn2" style="flex:1;margin:0;" onclick="this.innerHTML=(this.innerHTML.indexOf(\'Silenciado\')>=0?\'Silenciar micr&oacute;fono\':\'Silenciado\')">Silenciar micr&oacute;fono</div>'
+    +'<div class="cta" style="flex:1;margin:0;" onclick="go(\'agente\')">Terminar</div>'
+    +'</div>'
+    +'<p class="d" style="margin-top:12px;">Al terminar, la conversaci&oacute;n queda transcrita en el chat.</p>';
+}};
+
+SC.guia = {t:'Guía del alojamiento', g:'Mi estancia', f:function(){
+  return back('Home','home')+'<h1 class="s">Gu&iacute;a</h1>'
+    +'<p class="d">Todo sobre el alojamiento y la zona, preparado por [Gestor].</p>'
+    +'<div class="card"><div class="row" style="cursor:pointer" onclick="det(\'Normas de la casa\')">Normas de la casa <span>&rsaquo;</span></div>'
+    +'<div class="row" style="cursor:pointer" onclick="det(\'Climatizaci&oacute;n y equipamiento\')">Climatizaci&oacute;n y equipamiento <span>&rsaquo;</span></div>'
+    +'<div class="row" style="cursor:pointer" onclick="det(\'Residuos y reciclaje\')">Residuos y reciclaje <span>&rsaquo;</span></div>'
+    +'<div class="row" style="cursor:pointer" onclick="det(\'Aparcamiento\')">Aparcamiento <span>&rsaquo;</span></div>'
+    +'<div class="row" style="cursor:pointer" onclick="det(\'Piscina y zonas comunes\')">Piscina y zonas comunes <span>&rsaquo;</span></div>'
+    +'<div class="row" style="cursor:pointer" onclick="det(\'Instrucciones de salida\')">Instrucciones de salida <span>&rsaquo;</span></div></div>'
+    +'<div class="card"><h3>Recomendaciones</h3>'
+    +'<div class="row" style="cursor:pointer" onclick="det(\'Restaurante [X]\')">Restaurante [X] <span class="chip">Del gestor</span></div>'
+    +'<div class="row" style="cursor:pointer" onclick="det(\'Playa [Y]\')">Playa [Y] <span class="chip soft">Externa</span></div>'
+    +'<div class="row" style="cursor:pointer" onclick="det(\'Actividad [Z]\')">Actividad [Z] <span class="chip soft">Patrocinada</span></div></div>';
+}};
+
+SC.servicios = {t:'Servicios y experiencias', g:'Mi estancia', f:function(){
+  return back('Home','home')+'<h1 class="s">Servicios</h1>'
+    +'<p class="d">Sigue tus solicitudes y a&ntilde;ade lo que necesites a tu estancia.</p>'
+    +'<div style="display:flex;gap:8px;margin-bottom:14px;">'
+    +'<span class="chip '+(S.servtab==='sol'?'fill':'')+'" style="cursor:pointer;padding:7px 14px;font-size:12px;" onclick="S.servtab=\'sol\';render()">Mis solicitudes ('+(S.momento==='pre'?4:6)+')</span>'
+    +'<span class="chip '+(S.servtab!=='sol'?'fill':'')+'" style="cursor:pointer;padding:7px 14px;font-size:12px;" onclick="S.servtab=\'cat\';render()">Cat&aacute;logo</span>'
+    +'</div>'
+    +(S.servtab!=='sol' ? '' : (S.momento==='pre'
+      ? '<div class="card"><span class="chip soft tr">Solicitado</span><h3>Entrada temprana</h3>'
+        +'<p>El gestor confirmar&aacute; la disponibilidad en menos de 24 h.</p></div>'
+        +'<div class="card"><span class="chip fill tr">Confirmado</span><h3>Limpieza extra</h3>'
+        +'<p>Programada para el 13 ago, entre las 10:00 y las 12:00. 45&euro; pagados.</p></div>'
+        +'<div class="card"><span class="chip fill tr">Confirmado</span><h3>Cuna para beb&eacute;</h3>'
+        +'<p>Estar&aacute; preparada en la vivienda a vuestra llegada.</p></div>'
+        +'<div class="card"><span class="chip tr">No confirmado</span><h3>Parking cubierto</h3>'
+        +'<p>El gestor no ha podido confirmarlo. Reembolso autom&aacute;tico emitido: lo ver&aacute;s en tu cuenta en 3 a 5 d&iacute;as.</p></div>'
+      : '<div class="card"><span class="chip tr">Con incidencia</span><h3>Limpieza del d&iacute;a 14</h3>'
+        +'<p>El proveedor no pudo acceder a la vivienda. Puedes reprogramarla o hablar con el gestor.</p>'
+        +'<div class="btn2" onclick="S.ctx=\'Limpieza del d&iacute;a 14 (incidencia)\';go(\'chatgestor\')">Resolver con el gestor</div>'+'</div>'
+        +'<div class="card"><span class="chip soft tr">En preparaci&oacute;n</span><h3>Limpieza extra</h3>'
+        +'<div class="track">'
+        +'<div class="tstep done"><div class="td"></div>Solicitado</div>'
+        +'<div class="tstep done"><div class="td"></div>Confirmado</div>'
+        +'<div class="tstep now"><div class="td"></div>En preparaci&oacute;n</div>'
+        +'<div class="tstep"><div class="td"></div>Completado</div>'
+        +'</div>'
+        +'<p style="font-size:11.5px;color:#666;">Llegar&aacute; el 13 ago entre las 10:00 y las 12:00. Te avisaremos al completarse.</p></div>'
+        +'<div class="card"><span class="chip soft tr">Solicitado</span><h3>Salida tard&iacute;a</h3>'
+        +'<p>El gestor confirmar&aacute; la disponibilidad en menos de 24 h.</p></div>'
+        +'<div class="card"><span class="chip fill tr">Confirmado</span><h3>Cuna para beb&eacute;</h3>'
+        +'<p>Estar&aacute; preparada en la vivienda a vuestra llegada.</p></div>'
+        +'<div class="card"><span class="chip tr">Completado</span><h3>Pack de bienvenida</h3>'
+        +'<p>Entregado el 12 ago a vuestra llegada.</p></div>'
+        +'<div class="card"><span class="chip tr">No confirmado</span><h3>Parking cubierto</h3>'
+        +'<p>El gestor no ha podido confirmarlo. Reembolso autom&aacute;tico emitido: lo ver&aacute;s en tu cuenta en 3 a 5 d&iacute;as.</p></div>'))
+    +(S.servtab==='sol' ? '' : '<p class="fam">Servicios del alojamiento</p>'
+    +'<div class="card"><h3>Limpieza extra <span class="chip">45&euro;</span></h3><p>Impuestos incluidos &middot; Presta: [proveedor] &middot; Confirmaci&oacute;n en 24 h</p>'+'<div class="btn2" onclick="serv(\'Limpieza extra\')">Solicitar</div>'+'<div class="btn2" onclick="verDet(this,\'Limpieza extra\',\'Limpieza completa del alojamiento durante tu estancia: ba&ntilde;os, cocina, dormitorios y cambio de toallas y s&aacute;banas. La realiza el equipo de [proveedor] en la franja que elijas.\')">Ver detalles</div>'+'</div>'
+    +'<p class="fam">Llegada y comodidad</p>'
+    +'<div class="card"><h3>Entrada temprana <span class="chip">25&euro;</span></h3><p>Impuestos incluidos &middot; Seg&uacute;n disponibilidad &middot; Vende y presta: [gestor]</p>'+'<div class="btn2" onclick="serv(\'Entrada temprana\')">Solicitar</div>'+'<div class="btn2" onclick="verDet(this,\'Entrada temprana\',\'Entra al alojamiento desde las 12:00 en lugar de las 16:00, si la salida anterior lo permite. Se confirma seg&uacute;n disponibilidad.\')">Ver detalles</div>'+'</div>'
+    +'<p class="fam">Mejoras de la estancia</p>'
+    +'<div class="card"><h3>Pack de bienvenida <span class="chip">20&euro;</span></h3><p>Impuestos incluidos &middot; Vende y presta: [gestor]</p>'+'<div class="btn2" onclick="serv(\'Pack de bienvenida\')">Solicitar</div>'+'<div class="btn2" onclick="verDet(this,\'Pack de bienvenida\',\'Cesta de bienvenida a tu llegada: fruta, pan, aceite de la zona y detalles b&aacute;sicos para el primer desayuno.\')">Ver detalles</div>'+'</div>'
+    +'<div class="modal" hidden>'
+      +'<div class="mback" onclick="this.parentNode.hidden=true"></div>'
+      +'<div class="mbox">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><h3 class="mtitle" style="font-size:14px;">Servicio</h3><span class="lnk" style="margin:0" onclick="this.closest(\'.modal\').hidden=true">Cerrar &#10005;</span></div>'
+      +'<div style="position:relative;">'
+      +'<div class="img sframe" data-i="1" style="height:120px;margin-bottom:0;">foto 1 de 3</div>'
+      +'<div class="sarr" onclick="slide(this,-1)">&#8249;</div>'
+      +'<div class="sarr r" onclick="slide(this,1)">&#8250;</div>'
+      +'</div>'
+      +'<div class="sdots"><i class="on"></i><i></i><i></i></div>'
+      +'<p class="mdesc" style="font-size:12.5px;line-height:1.5;margin-top:10px;"></p>'
+      +'</div></div>');
+}};
+
+SC.rewards = {t:'Rewards', g:'Mi estancia', f:function(){
+  return back('Home','home')+'<h1 class="s">Rewards</h1>'
+    +'<p class="d">Gana puntos cuidando la vivienda durante tu estancia. Se confirman tras el check-out.</p>'
+    +'<div class="card"><h3>Objetivos de esta estancia</h3>'
+    +'<div class="row">Consumo razonable <span class="chip fill">En curso</span></div><div class="bar"><i style="width:70%"></i></div>'
+    +'<div class="row">Reciclaje <span class="chip fill">En curso</span></div><div class="bar"><i style="width:40%"></i></div>'
+    +'<div class="row">Cuidado de la vivienda <span class="chip soft">Se confirma al final</span></div></div>'
+    +'<div class="card"><h3>Puntos estimados: 120</h3><p>Se confirmar&aacute;n despu&eacute;s del check-out. Valen descuentos en futuras reservas directas, servicios y ventajas del gestor.</p></div>'
+    +(!S.cuenta?'<div class="banner"><b>Sin cuenta, estos puntos se pierden al terminar.</b> Crea tu cuenta Rentsody para conservarlos.</div>'+btn2('Crear cuenta','login'):'');
+}};
+
+SC.ayuda = {t:'Ayuda', g:'Mi estancia', f:function(){
+  return back('Home','home')+'<h1 class="s">Ayuda</h1>'
+    +'<p class="d">&iquest;Necesitas algo? Habla directamente con la persona que gestiona tu estancia.</p>'
+    +'<div class="card"><h3>[Gestor]</h3><p>Respuesta habitual en menos de 1 h</p>'+'<div class="cta" onclick="S.ctx=\'\';go(\'chatgestor\')">Escribir al gestor</div>'+'<div class="btn2" style="display:block;width:100%;padding:12px;font-size:13px;margin:10px 0;">Llamar: +34 600 000 000</div>'
+    +(S.origen==='ota'?'<p style="font-size:11.5px;color:#666;margin-top:6px;">Tu conversaci&oacute;n de Airbnb sigue disponible: los mensajes se unifican en un solo hilo, sin duplicados.</p>':'')+'</div>'
+    +'<div class="card"><h3>&iquest;Algo no funciona?</h3>'+btn2('No puedo entrar','noentra')+btn2('Comunicar una incidencia','incidencia')+'</div>';
+}};
+
+SC.incidencia = {t:'Incidencia', g:'Mi estancia', f:function(){
+  return back('Ayuda','ayuda')+'<h1 class="s">Comunicar incidencia</h1>'
+    +field('&iquest;Qu&eacute; ha pasado?','')
+    +'<div class="field"><label>Foto (opcional)</label>'+img(70,'a&ntilde;adir foto')+'</div>'
+    +cta('Enviar al gestor','ayuda');
+}};
+
+SC.chatgestor = {t:'Conversación con el gestor', g:'Mi estancia', f:function(){
+  return back('Ayuda','ayuda')+'<h1 class="s">[Gestor]</h1>'
+    +'<p class="d">Toda tu conversaci&oacute;n en un solo hilo, escribas desde la app, el email o WhatsApp.</p>'
+    +(S.ctx?'<div class="banner"><b>Sobre:</b> '+S.ctx+'</div>':'')
+    +'<div class="chat">'
+    +'<div class="bub me">Hola, &iquest;se puede aparcar en la calle del apartamento?</div>'
+    +'<div class="bub">&iexcl;Hola Alba! S&iacute;, es zona libre. Tienes los detalles en la gu&iacute;a, secci&oacute;n aparcamiento.</div>'
+    +'</div>'
+    +field('Escribe tu mensaje','')
+    +cta('Enviar','chatgestor');
+}};
+
+SC.servdet = {t:'Solicitar servicio', g:'Mi estancia', f:function(){
+  return '<span class="bk" onclick="go(S.prev)">&larr; Servicios</span><h1 class="s">'+(S.det||'Servicio')+'</h1>'
+    +'<div class="card"><p>Impuestos incluidos &middot; Vende: [gestor] &middot; Presta: [proveedor]</p><p>Confirmaci&oacute;n en 24 h</p></div>'
+    +field('Fecha y franja preferida','13 ago &middot; ma&ntilde;ana')
+    +field('Notas para el gestor (opcional)','')
+    +'<div class="card"><div class="row"><b>Total</b> <b>45&euro;</b></div></div>'
+    +'<p class="fam">M&eacute;todo de pago</p>'
+    +'<div>'
+    +'<div class="paycard on" onclick="payPick(this)"><div class="ptop"><span class="box">&#9745;</span><b>Tarjeta de cr&eacute;dito/d&eacute;bito</b><span class="plogo">Redsys</span></div><p>Pago seguro a trav&eacute;s de pasarela bancaria</p></div>'
+    +'<div class="paycard" onclick="payPick(this)"><div class="ptop"><span class="box">&#9744;</span><b>Stripe</b><span class="plogo">stripe</span></div><p>Pago seguro a trav&eacute;s de la plataforma Stripe</p></div>'
+    +'</div>'
+    +'<p style="font-size:12px;color:#444;margin:14px 0;cursor:pointer;display:flex;gap:8px;align-items:flex-start;" onclick="chk(this)"><span class="box" style="font-size:15px;">&#9744;</span><span>Acepto los <span class="lnk" onclick="event.stopPropagation();det(\'T&eacute;rminos y condiciones\')">t&eacute;rminos y condiciones</span></span></p>'
+    +cta('Confirmar y pagar','servicios')
+    +'<p class="d">Si el servicio no se confirma, el reembolso es autom&aacute;tico.</p>';
+}};
+
+SC.detalle = {t:'Detalle de contenido', g:'Genéricas', f:function(){
+  return '<span class="bk" onclick="go(S.prev)">&larr; Volver</span><h1 class="s">'+(S.det||'Contenido')+'</h1>'
+    +img(100,'imagen o mapa')
+    +'<div class="card"><p>[Texto, pasos o indicaciones de "'+(S.det||'este contenido')+'"]</p></div>'
+    +'<div class="card"><p>[Bloque adicional: horarios, normas concretas, fotos del equipamiento...]</p></div>';
+}};
+
+SC.notifs = {t:'Notificaciones', g:'Genéricas', f:function(){
+  if(S.cuenta && !S.estancia){
+    return '<span class="bk" onclick="go(S.prev)">&larr; Volver</span><h1 class="s">Notificaciones</h1>'
+      +'<p class="d">Los avisos de tu cuenta y tus reservas.</p>'
+      +'<div class="notif" onclick="go(\'perfil\')"><small>Lunes &middot; 10:00</small><p>Tus 340 puntos siguen disponibles: valen 34&euro; en tu pr&oacute;xima reserva directa.</p></div>'
+      +'<div class="notif" onclick="go(\'viaje\')"><small>Mayo</small><p>Tu viaje a [Alojamiento B] se complet&oacute;: +80 puntos confirmados.</p></div>'
+      +'<div class="card" style="margin-top:14px;"><h3>Canal de avisos</h3><p>Adem&aacute;s de aqu&iacute;, te avisamos por el canal que elijas.</p><p style="margin-top:6px;"><span class="chip fill" style="cursor:pointer" onclick="pick(this)">Email</span> <span class="chip" style="cursor:pointer" onclick="pick(this)">WhatsApp</span></p></div>';
+  }
+  return '<span class="bk" onclick="go(S.prev)">&larr; Volver</span><h1 class="s">Notificaciones</h1>'
+    +'<p class="d">Los avisos de tu estancia. Los que necesitan algo de ti aparecen primero.</p>'
+    +(S.momento!=='pre'?'<div class="notif new" onclick="go(\'servicios\')"><small>Hoy &middot; 9:30</small><p>La limpieza del d&iacute;a 14 tiene una incidencia: el proveedor no pudo acceder. Toca para resolverla.</p></div>':'')
+    +'<div class="notif new" onclick="go(\'servicios\')"><small>Hoy &middot; 10:12</small><p>Tu solicitud de limpieza extra se ha confirmado. Llegar&aacute; el 13 ago entre las 10:00 y las 12:00.</p></div>'
+    +'<div class="notif" onclick="go(\'checkin\')"><small>Ayer &middot; 18:40</small><p>Dani ha empezado su check-in. Quedan 2 viajeros por invitar.</p></div>'
+    +'<div class="notif" onclick="go(\'llegada\')"><small>Ayer &middot; 12:00</small><p>Tu llave digital se activar&aacute; cuando el grupo complete el check-in.</p></div>'
+    +'<div class="card" style="margin-top:14px;"><h3>Canal de avisos</h3><p>Adem&aacute;s de aqu&iacute;, te avisamos por el canal que elijas.</p><p style="margin-top:6px;"><span class="chip fill" style="cursor:pointer" onclick="pick(this)">Email</span> <span class="chip" style="cursor:pointer" onclick="pick(this)">WhatsApp</span></p></div>';
+}};
+
+SC.idioma = {t:'Idioma', g:'Genéricas', f:function(){
+  return '<span class="bk" onclick="go(S.prev)">&larr; Volver</span><h1 class="s">Idioma</h1>'
+    +'<p class="d">Elige el idioma de la app y de los avisos.</p>'
+    +'<div class="card">'
+    +'<div class="row">Espa&ntilde;ol <span class="chip fill">Actual</span></div>'
+    +'<div class="row">English <span class="lnk">Elegir</span></div>'
+    +'<div class="row">Fran&ccedil;ais <span class="chip soft">M&aacute;s adelante</span></div>'
+    +'<div class="row">Deutsch <span class="chip soft">M&aacute;s adelante</span></div>'
+    +'<div class="row">Italiano <span class="chip soft">M&aacute;s adelante</span></div>'
+    +'<div class="row">Portugu&ecirc;s <span class="chip soft">M&aacute;s adelante</span></div>'
+    +'<div class="row">Nederlands <span class="chip soft">M&aacute;s adelante</span></div></div>';
+}};
+
+SC.recuperar = {t:'Recuperar contraseña', g:'Cuenta', f:function(){
+  return back('Login','login')+'<h1 class="s">Recuperar contrase&ntilde;a</h1>'
+    +'<p class="d">Te enviamos un enlace para crear una nueva.</p>'
+    +field('Email','alba@correo.com')
+    +cta('Enviar enlace','login');
+}};
+
+SC.checkout = {t:'Check-out', g:'Mi estancia', f:function(){
+  var val = S.origen==='ota'
+    ? ''
+    : '<div class="card"><h3>Valora tu estancia</h3><div class="stars" id="stars"><span onclick="setStars(1)" style="cursor:pointer">&#9734;</span><span onclick="setStars(2)" style="cursor:pointer">&#9734;</span><span onclick="setStars(3)" style="cursor:pointer">&#9734;</span><span onclick="setStars(4)" style="cursor:pointer">&#9734;</span><span onclick="setStars(5)" style="cursor:pointer">&#9734;</span></div>'+field('Comentario (opcional)','')+'</div>';
+  return back('Home','home')+'<h1 class="s">Check-out</h1>'
+    +'<div class="card"><h3>Salida: 16 ago, 11:00</h3><p>Instrucciones: llaves en la caja, cerrar ventanas, bajar persianas.</p></div>'
+    +'<div class="card"><h3>Pendiente</h3><div class="row">Confirmar salida <span class="chip soft">Pendiente</span></div></div>'
+    +val
+    +(S.momento==='out'
+      ? cta('Confirmar salida','gracias')
+      : '<div class="cta dis">Confirmar salida</div>'
+        +'<p class="d" style="text-align:center;margin-top:-6px;">Disponible el d&iacute;a de tu salida, el 16 ago.</p>');
+}};
+
+SC.gracias = {t:'Fin de estancia', g:'Mi estancia', f:function(){
+  return '<h1 class="s">&iexcl;Buen viaje, Alba!</h1>'
+    +'<p class="d">Gracias por tu estancia. Esperamos verte pronto.</p>'
+    +'<div class="card"><h3>Tus Rewards: 120 puntos</h3><p>Confirmados tras el check-out.</p></div>'
+    +(!S.cuenta
+      ?'<div class="banner"><b>No pierdas tus 120 puntos.</b> Crea tu cuenta Rentsody y consérvalos para tu pr&oacute;xima reserva, junto con tu historial de viajes.</div>'+cta('Crear mi cuenta','login')+'<span class="lnk" onclick="go(\'home\')">Ahora no</span>'
+      :'<div class="card"><h3>Saldo total: 340 puntos</h3><p>&Uacute;salos como descuento en tu pr&oacute;xima reserva directa.</p>'+cta('Ver alojamientos de la red','buscador')+'</div>');
+}};
+
+SC.login = {t:'Login / registro', g:'Cuenta', f:function(){
+  return '<h1 class="s">Cuenta Rentsody</h1>'
+    +'<p class="d">Guarda tus viajes y tus puntos, y reserva en toda la red.</p>'
+    +(!S.cuenta ? (S.momento==='est'
+        ? '<div class="banner"><b>Llevas 120 puntos en curso en esta estancia.</b> Con cuenta, se conservar&aacute;n al terminar.</div>'
+        : (S.momento==='out'
+          ? '<div class="banner"><b>No pierdas tus 120 puntos de esta estancia.</b> Crea tu cuenta y cons&eacute;rvalos para tu pr&oacute;xima reserva.</div>'
+          : '')) : '')
+    +field('Email','alba@correo.com')+field('Contrase&ntilde;a','&bull;&bull;&bull;&bull;&bull;&bull;')
+    +'<div class="cta" onclick="doLogin()">Entrar</div>'
+    +'<div class="btn2" onclick="doLogin()">Crear cuenta nueva</div>'
+    +'<span class="lnk" onclick="go(\'recuperar\')">He olvidado mi contrase&ntilde;a</span>';
+}};
+
+SC.misviajes = {t:'Mis viajes', g:'Cuenta', f:function(){
+  if(!S.cuenta) return '<div class="banner">Requiere cuenta. Activa "Login con cuenta" en el panel para simular.</div>'+btn2('Ir a login','login');
+  return '<h1 class="s">Mis viajes</h1>'
+    +'<p class="d">Tus estancias activas, pr&oacute;ximas y anteriores.</p>'
+    +(S.estancia
+      ?'<div class="card"><h3>Estancia activa</h3><p>[Alojamiento] &middot; 12&ndash;16 ago</p>'+cta('Abrir mi estancia','home')+'</div>'
+      :'<div class="card"><h3>Sin estancias activas ni pr&oacute;ximas</h3><p>Tu pr&oacute;ximo viaje puede salir de la red: usa tus 340 puntos como descuento.</p>'+cta('Explorar la red','buscador')+'</div>')
+    +'<div class="card"><h3>Anteriores</h3>'
+    +'<div class="row">[Alojamiento B] &middot; may 2026 <span class="lnk" onclick="go(\'viaje\')">Ver</span></div>'
+    +'<div class="row">[Alojamiento C] &middot; ago 2025 <span class="lnk" onclick="go(\'viaje\')">Ver</span></div></div>';
+}};
+
+SC.viaje = {t:'Detalle de viaje', g:'Cuenta', f:function(){
+  return back('Mis viajes','misviajes')+'<h1 class="s">[Alojamiento B]</h1>'
+    +img(100,'foto')
+    +'<div class="card"><span class="chip tr">Completada</span><p>3&ndash;7 may 2026</p><p>Servicios: limpieza extra &middot; Rewards: +80 puntos</p><span class="lnk" onclick="det(\'Justificantes\')">Justificantes</span></div>'
+    +cta('Volver a reservar','ficha')+btn2('Ver alojamientos similares','buscador');
+}};
+
+SC.perfil = {t:'Cuenta', g:'Cuenta', f:function(){
+  if(!S.cuenta) return '<div class="banner">Requiere cuenta. Activa "Login con cuenta" en el panel para simular.</div>'+btn2('Ir a login','login');
+  return '<h1 class="s">Mi cuenta</h1>'
+    +'<div class="card">'
+    +'<div class="row">Mis viajes <span class="lnk" onclick="go(\'misviajes\')">Abrir</span></div>'
+    +'<div class="row" style="cursor:pointer" onclick="go(\'rewards\')">Rentsody Rewards &middot; 340 pts <span>&rsaquo;</span></div>'
+    +'<div class="row">Perfil de confianza <span class="lnk" onclick="go(\'confianza\')">Ver</span></div>'
+    +'<div class="row" style="cursor:pointer" onclick="det(\'Mis datos y permisos\')">Mis datos y permisos <span>&rsaquo;</span></div>'
+    +'<div class="row" style="cursor:pointer" onclick="go(\'idioma\')">Idioma: Espa&ntilde;ol <span>&rsaquo;</span></div>'
+    +'<div class="row" style="cursor:pointer" onclick="S.prev=\'perfil\';go(\'notifs\')">Canal de avisos: Email <span>&rsaquo;</span></div>'
+    +'<div class="row" style="cursor:pointer" onclick="det(\'Privacidad y legal\')">Privacidad y legal <span>&rsaquo;</span></div></div>';
+}};
+
+SC.confianza = {t:'Perfil de confianza', g:'Cuenta', f:function(){
+  return back('Mi cuenta','perfil')+'<h1 class="s">Perfil de confianza</h1>'
+    +'<p class="d">Tu historial como hu&eacute;sped, basado en se&ntilde;ales verificadas de tus estancias.</p>'
+    +'<div class="card"><span class="chip tr">Perfil inicial</span><h3>Tu perfil</h3><p>2 estancias completadas. Tu puntuaci&oacute;n (0 a 100) se calcular&aacute; a partir de la tercera.</p></div>'
+    +'<div class="card"><h3>Se&ntilde;ales verificadas</h3>'
+    +'<div class="row">Convivencia y ruido <span class="chip fill">Sin incidencias</span></div>'
+    +'<div class="row">Cuidado de la vivienda <span class="chip fill">Sin incidencias</span></div>'
+    +'<div class="row">Cumplimiento de normas <span class="chip fill">Sin incidencias</span></div></div>'
+    +'<div class="card"><p>En reservas bajo petici&oacute;n, el gestor puede ver un resumen verificado, siempre con tu consentimiento. La decisi&oacute;n final es suya, nunca autom&aacute;tica.</p></div>'
+    +btn2('No estoy de acuerdo con un dato: solicitar revisi&oacute;n','confianza');
+}};
+
+SC.buscador = {t:'Buscador de la red', g:'Buscador (con cuenta)', f:function(){
+  if(!S.cuenta) return '<h1 class="s">Alojamientos de la red</h1><div class="banner"><b>Ventaja de miembros.</b> El buscador de la red est&aacute; disponible al crear tu cuenta Rentsody.</div>'+cta('Crear cuenta','login');
+  return '<h1 class="s">Alojamientos de la red</h1>'
+    +'<p class="d">Reserva directamente y aprovecha tus ventajas de miembro.</p>'
+    +'<div class="card">'
+    +field('&iquest;D&oacute;nde quieres ir?','Destino o zona')
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
+    +field('Entrada','12 ago')+field('Salida','16 ago')
+    +'</div>'
+    +field('Viajeros','4 viajeros')
+    +'<div class="cta" onclick="S.buscado=true;go(\'buscador\')">Buscar</div>'
+    +'</div>'
+    +(S.buscado
+      ? '<p class="d">2 alojamientos disponibles para tus fechas</p>'
+        +'<div class="card" style="cursor:pointer" onclick="go(\'ficha\')">'
+        +'<div style="position:relative;">'+img(100,'foto')+'<span class="chip" style="position:absolute;top:8px;right:8px;background:#fff;">&#9733; 4,8 &middot; Excelente</span></div>'
+        +'<h3>Apartamento junto al mar</h3>'
+        +'<p>Luminoso, con terraza y vistas a la playa de Moj&aacute;car.</p>'
+        +'<div class="row" style="border:none;padding:6px 0 0;"><span style="font-size:11.5px;color:#666;">4 hu&eacute;spedes &middot; 2 dormitorios</span><span><b>696&euro;</b> &middot; 4 noches</span></div></div>'
+        +'<div class="card" style="cursor:pointer" onclick="go(\'ficha\')">'
+        +'<div style="position:relative;">'+img(100,'foto')+'<span class="chip" style="position:absolute;top:8px;right:8px;background:#fff;">&#9733; 4,6 &middot; Muy bien</span></div>'
+        +'<h3>Casa con piscina en Vera</h3>'
+        +'<p>Casa familiar con piscina compartida, a 5 minutos del centro.</p>'
+        +'<div class="row" style="border:none;padding:6px 0 0;"><span style="font-size:11.5px;color:#666;">6 hu&eacute;spedes &middot; 3 dormitorios</span><span><b>600&euro;</b> &middot; 4 noches</span></div></div>'
+      : '<p class="d" style="text-align:center;color:#999;margin-top:22px;">Introduce destino y fechas y pulsa Buscar para ver los alojamientos de la red.</p>');
+}};
+
+SC.ficha = {t:'Ficha de alojamiento', g:'Buscador (con cuenta)', f:function(){
+  function fq(q,a){
+    return '<div class="row" style="display:block;cursor:pointer;" onclick="var x=this.querySelector(\'p\');x.hidden=!x.hidden">'
+      +'<div style="display:flex;justify-content:space-between;gap:10px;"><span>'+q+'</span><span style="color:#999">&#8250;</span></div>'
+      +'<p hidden style="font-size:12px;color:#555;padding-top:6px;">'+a+'</p></div>';
+  }
+  return back('Buscador','buscador')+'<h1 class="s">Apartamento junto al mar</h1>'
+    +'<div style="position:relative;">'+img(130,'foto principal')+'<span class="chip" style="position:absolute;top:8px;right:8px;background:#fff;">&#9733; 4,8 &middot; Excelente</span></div>'
+    +'<div class="btn2" style="display:block;width:100%;padding:12px;font-size:13px;margin:10px 0;" onclick="S.gal=-1;go(\'galeria\')">Ver todas las fotos (9)</div>'
+    +'<div class="card"><div class="row">12 &ndash; 16 ago &middot; 4 viajeros <span class="lnk" onclick="go(\'buscador\')">Cambiar</span></div></div>'
+    +'<div class="card"><h3>Caracter&iacute;sticas principales</h3><p style="margin-top:8px;"><span class="chip">Apartamento</span> <span class="chip">100 m&sup2;</span> <span class="chip">4 hu&eacute;spedes</span> <span class="chip">2 dormitorios</span> <span class="chip">1 ba&ntilde;o</span></p></div>'
+    +'<div class="card"><h3>Sobre este alojamiento</h3><p>Apartamento luminoso con terraza y vistas al mar, junto a la playa de Moj&aacute;car. Reformado en 2024.</p>'
+    +'<p style="font-size:11.5px;color:#666;margin-top:6px;">N&uacute;mero de registro (NRA): [VFT/AL/00000]</p></div>'
+    +'<div class="card"><h3>Servicios incluidos</h3><p style="margin-top:8px;"><span class="chip">Wifi</span> <span class="chip">Aire acondicionado</span> <span class="chip">Piscina</span> <span class="chip">Parking</span></p>'
+    +'<div class="btn2" onclick="det(\'Todos los servicios\')">Ver todos los servicios</div></div>'
+    +'<div class="card"><h3>D&oacute;nde se encuentra</h3>'+img(90,'mapa de la zona')
+    +'<p>[Calle, n&uacute;mero, c&oacute;digo postal, localidad]</p>'
+    +'<p style="font-size:11.5px;color:#666;margin-top:4px;">Moj&aacute;car Playa, junto a la playa de Macenas.</p></div>'
+    +'<div class="card"><h3>Preguntas frecuentes</h3>'
+    +fq('&iquest;A qu&eacute; hora son el check-in y el check-out?','Entrada a partir de las 16:00 y salida antes de las 11:00. Podr&aacute;s solicitar entrada temprana o salida tard&iacute;a como servicio.')
+    +fq('&iquest;Se admiten mascotas?','No se admiten mascotas en este alojamiento.')
+    +fq('&iquest;Hay aparcamiento disponible?','S&iacute;, plaza incluida en el mismo edificio.')
+    +fq('&iquest;Cu&aacute;l es la pol&iacute;tica de cancelaci&oacute;n?','Cancelaci&oacute;n gratuita hasta 7 d&iacute;as antes de la llegada.')
+    +fq('&iquest;C&oacute;mo recibo las instrucciones de llegada?','Al confirmar la reserva recibir&aacute;s el enlace de tu estancia, con la llegada paso a paso y tu llave digital.')
+    +'</div>'
+    +'<div class="card"><h3>Del 12 al 16 ago &middot; 696&euro;</h3><p><b>Ventaja de la red:</b> tus 340 puntos valen 34&euro; de descuento.</p></div>'
+    +(S.modo==='pet'?'<div class="banner">Este alojamiento confirma las reservas <b>bajo petici&oacute;n</b>: primero env&iacute;as la solicitud y pagas cuando el gestor la acepta.</div>'+cta('Solicitar reserva','pago'):cta('Reservar','pago'));
+}};
+
+SC.galeria = {t:'Galería de fotos', g:'Buscador (con cuenta)', f:function(){
+  var esp=[['Sal&oacute;n',2],['Cocina',1],['Habitaci&oacute;n 1',2],['Habitaci&oacute;n 2',1],['Ba&ntilde;o',1],['Terraza',2]];
+  if(S.gal>=0){
+    var e=esp[S.gal], h='';
+    for(var n=1;n<=e[1];n++){ h+=img(120, e[0]+' &middot; foto '+n+' de '+e[1]); }
+    return '<span class="bk" onclick="S.gal=-1;render()">&larr; Todos los espacios</span>'
+      +'<h1 class="s">'+e[0]+'</h1>'
+      +'<p class="d">'+e[1]+(e[1]===1?' foto':' fotos')+' de este espacio.</p>'+h;
+  }
+  var grid='';
+  esp.forEach(function(e,i){
+    grid+='<div style="cursor:pointer" onclick="S.gal='+i+';render()">'+img(80,'foto')
+      +'<p style="font-size:12.5px;margin:-6px 0 4px;"><b>'+e[0]+'</b> &middot; '+e[1]+(e[1]===1?' foto':' fotos')+'</p></div>';
+  });
+  return back('Ficha','ficha')+'<h1 class="s">Galer&iacute;a de fotos</h1>'
+    +'<p class="d">Explora la vivienda espacio por espacio.</p>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'+grid+'</div>';
+}};
+
+SC.pago = {t:'Confirmar reserva', g:'Buscador (con cuenta)', f:function(){
+  return back('Ficha','ficha')+'<h1 class="s">Confirmar reserva</h1>'
+    +'<p class="d">Revisa los datos antes de pagar. El cobro se realiza de forma segura a trav&eacute;s de la pasarela que elijas.</p>'
+    +'<p class="fam">Resumen de la reserva</p>'
+    +'<div class="card">'
+    +'<div style="position:relative;">'+img(80,'foto')+'<span class="chip" style="position:absolute;top:8px;right:8px;background:#fff;">&#9733; 4,8 &middot; Excelente</span></div>'
+    +'<h3>Apartamento junto al mar</h3>'
+    +'<div class="row">Entrada <b>12 ago 2026</b></div>'
+    +'<div class="row">Salida <b>16 ago 2026</b></div>'
+    +'<div class="row">Viajeros <b>4</b></div>'
+    +'<div class="btn2" style="display:block;width:100%;padding:12px;font-size:13px;margin:10px 0;" onclick="go(\'buscador\')">Editar fechas o viajeros</div>'
+    +'<div class="row">Alojamiento (4 noches) <span>696&euro;</span></div>'
+    +'<div class="row">Costes de limpieza <span>Incluidos</span></div>'
+    +'<div class="row">Impuestos locales <span>Incluidos</span></div>'
+    +'<div class="row">Descuento Rewards <span>&minus;34&euro;</span></div>'
+    +'<div class="row"><b>Total</b> <b>662&euro;</b></div></div>'
+    +'<div class="card"><div class="row">Usar 340 puntos (&minus;34&euro;) <div class="switch on" onclick="this.classList.toggle(\'on\')"><i></i></div></div></div>'
+    +'<p class="fam">Datos de contacto</p>'
+    +'<div class="card">'
+    +'<p style="font-size:11.5px;color:#666;margin-bottom:8px;">Tomados de tu cuenta. Puedes editarlos para esta reserva.</p>'
+    +field('Nombre','Alba')+field('Apellidos','[Apellidos]')
+    +field('Correo electr&oacute;nico','alba@correo.com')
+    +'<p style="font-size:11.5px;color:#666;margin:-6px 0 10px;">La confirmaci&oacute;n de la reserva se enviar&aacute; a esta direcci&oacute;n.</p>'
+    +field('Tel&eacute;fono de contacto','+34 600 000 000')
+    +field('Peticiones especiales (opcional)','Cuna, camas supletorias, alergias...')
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
+    +field('Hora de llegada','Selecciona')+field('Hora de salida','Selecciona')
+    +'</div>'
+    +'<p style="font-size:11.5px;color:#666;margin-top:-4px;">Horas aproximadas, seg&uacute;n la disponibilidad del alojamiento.</p>'
+    +'</div>'
+    +(S.modo==='pet'
+      ? '<div class="banner">Reserva <b>bajo petici&oacute;n</b>: ahora env&iacute;as la solicitud, sin ning&uacute;n cargo. El pago se realizar&aacute; cuando el gestor la acepte.</div>'
+        +'<p style="font-size:12px;color:#444;margin:14px 0;cursor:pointer;display:flex;gap:8px;align-items:flex-start;" onclick="chk(this)"><span class="box" style="font-size:15px;">&#9744;</span><span>Acepto los <span class="lnk" onclick="event.stopPropagation();det(\'T&eacute;rminos y condiciones\')">t&eacute;rminos y condiciones</span> y la <span class="lnk" onclick="event.stopPropagation();det(\'Pol&iacute;tica de cancelaci&oacute;n\')">pol&iacute;tica de cancelaci&oacute;n</span></span></p>'
+        +cta('Enviar solicitud de reserva','solicitada')
+      : '<p class="fam">M&eacute;todo de pago</p>'
+        +'<div>'
+        +'<div class="paycard on" onclick="payPick(this)"><div class="ptop"><span class="box">&#9745;</span><b>Tarjeta de cr&eacute;dito/d&eacute;bito</b><span class="plogo">Redsys</span></div><p>Pago seguro a trav&eacute;s de pasarela bancaria</p></div>'
+        +'<div class="paycard" onclick="payPick(this)"><div class="ptop"><span class="box">&#9744;</span><b>Stripe</b><span class="plogo">stripe</span></div><p>Pago seguro a trav&eacute;s de la plataforma Stripe</p></div>'
+        +'</div>'
+        +'<p style="font-size:12px;color:#444;margin:14px 0;cursor:pointer;display:flex;gap:8px;align-items:flex-start;" onclick="chk(this)"><span class="box" style="font-size:15px;">&#9744;</span><span>Acepto los <span class="lnk" onclick="event.stopPropagation();det(\'T&eacute;rminos y condiciones\')">t&eacute;rminos y condiciones</span> y la <span class="lnk" onclick="event.stopPropagation();det(\'Pol&iacute;tica de cancelaci&oacute;n\')">pol&iacute;tica de cancelaci&oacute;n</span></span></p>'
+        +'<div class="cta" onclick="doConfirm()">Confirmar y pagar</div>');
+}};
+
+SC.solicitada = {t:'Solicitud enviada', g:'Buscador (con cuenta)', f:function(){
+  return '<h1 class="s">Solicitud enviada</h1>'
+    +'<p class="d">Tu solicitud est&aacute; en manos del gestor. No se te cobrar&aacute; nada hasta que la acepte.</p>'
+    +'<div class="card"><span class="chip soft tr">Pendiente</span><h3>[Alojamiento] &middot; 12&ndash;16 ago</h3><p>El gestor suele responder en menos de 24 horas. Te avisaremos por email; si acepta, podr&aacute;s completar el pago.</p></div>'
+    +btn2('Ver en Mis viajes','misviajes')+'<span class="lnk" onclick="go(\'buscador\')">Seguir explorando</span>';
+}};
+
+SC.confirmada = {t:'Confirmación', g:'Buscador (con cuenta)', f:function(){
+  return '<h1 class="s">&iexcl;Reserva confirmada!</h1>'
+    +'<p class="d">Tus fechas quedan reservadas. Ya puedes empezar a preparar tu estancia.</p>'
+    +'<div class="card"><h3>[Alojamiento] &middot; 12&ndash;16 ago</h3><p>Te hemos enviado el enlace de tu estancia por email. Tambi&eacute;n la tienes en Mis viajes.</p></div>'
+    +cta('Ir a mi estancia','home')+btn2('Ver en Mis viajes','misviajes');
+}};
+
+/* ---------- índice y navegación ---------- */
+var ORDER = ['home','reserva','checkin','ckform','llegada','noentra','vivienda','agente','voz','guia','servicios','rewards','ayuda','incidencia','chatgestor','servdet','checkout','gracias','login','recuperar','misviajes','viaje','perfil','confianza','buscador','ficha','galeria','pago','solicitada','confirmada','detalle','idioma','notifs'];
+
+function go(name){S.screen=name;render();}
+function doLogin(){S.cuenta=true;S.screen=S.estancia?'home':'misviajes';render();}
+function doConfirm(){S.estancia=true;S.momento='pre';S.screen='confirmada';render();}
+function abrir(el){el.innerHTML='Abriendo&hellip;';setTimeout(function(){el.innerHTML='Puerta abierta &#10003;';setTimeout(function(){el.innerHTML='Abrir puerta';},2500);},900);}
+function det(t){S.det=t;S.prev=S.screen;S.screen='detalle';render();}
+function serv(t){S.det=t;S.prev=S.screen;S.screen='servdet';render();}
+function pick(el){Array.prototype.forEach.call(el.parentNode.children,function(c){c.classList.remove('fill');});el.classList.add('fill');}
+function payPick(el){Array.prototype.forEach.call(el.parentNode.querySelectorAll('.paycard'),function(c){c.classList.remove('on');var b=c.querySelector('.box');if(b)b.innerHTML='&#9744;';});el.classList.add('on');el.querySelector('.box').innerHTML='&#9745;';}
+function chk(el){var b=el.querySelector('.box');b.innerHTML=(b.innerHTML==='☑'?'&#9744;':'&#9745;');}
+function verDet(el,t,d){
+  var sc=el.closest('.screen');
+  sc.querySelector('.mtitle').innerHTML=t;
+  sc.querySelector('.mdesc').innerHTML=d;
+  var f=sc.querySelector('.sframe'); f.dataset.i=1; f.innerHTML='foto 1 de 3';
+  Array.prototype.forEach.call(sc.querySelectorAll('.sdots i'),function(dt,k){dt.className=(k===0?'on':'');});
+  sc.querySelector('.modal').hidden=false;
+}
+function slide(el,d){
+  var box=el.parentNode;
+  var f=box.querySelector('.sframe');
+  var i=parseInt(f.dataset.i||'1',10)+d;
+  if(i<1)i=3; if(i>3)i=1;
+  f.dataset.i=i; f.innerHTML='foto '+i+' de 3';
+  var dots=box.parentNode.querySelectorAll('.sdots i');
+  Array.prototype.forEach.call(dots,function(dt,k){dt.className=(k===i-1?'on':'');});
+}
+function setStars(n){var e=document.getElementById('stars');if(!e)return;var h='';for(var i=1;i<=5;i++){h+='<span onclick="setStars('+i+')" style="cursor:pointer">'+(i<=n?'&#9733;':'&#9734;')+'</span>';}e.innerHTML=h;}
+function set(k,v){S[k]=v;render();}
+
+function sidenav(){
+  function sn(name,label){return '<div class="sn '+(S.screen===name?'on':'')+'" onclick="go(\''+name+'\')">'+label+'</div>';}
+  var h='';
+  if(!S.cuenta || S.estancia){
+    h+='<div class="snh">Mi estancia</div>'
+      +sn('home','Inicio')
+      +(S.one?sn('agente','Asistente'):'')
+      +sn('reserva','Mi reserva')+sn('checkin','Check-in')+sn('llegada','Llegada y acceso')
+      +(S.one?sn('vivienda','Vivienda'):'')
+      +sn('guia','Gu&iacute;a')+sn('servicios','Servicios')+sn('rewards','Rewards')+sn('ayuda','Ayuda')+sn('checkout','Check-out');
+  }
+  if(S.cuenta){
+    h+='<div class="snh">Red Rentsody</div>'
+      +sn('buscador','Explorar alojamientos')
+      +'<div class="snh">Cuenta</div>'
+      +sn('misviajes','Mis viajes')+sn('perfil','Mi cuenta');
+  }
+  return '<div class="sidenav">'+h+'</div>';
+}
+
+function render(){
+  var lang='<span class="lang" onclick="go(\'idioma\')">ES &#9662;</span>';
+  var hasNew = (!S.cuenta || S.estancia);
+  var bell = (S.screen==='login'||S.screen==='recuperar') ? '' : '<span class="bell" onclick="S.prev=S.screen;go(\'notifs\')">&#128276;'+(hasNew?'<i></i>':'')+'</span>';
+  var right='<span style="display:flex;gap:8px;align-items:center">'+bell+lang+'</span>';
+  var bb;
+  if(S.cuenta || S.screen==='login'){
+    bb='<span class="logo">RENTSODY GUEST</span>'+right;
+  } else {
+    bb='<span class="logo">LOGO GESTOR</span>'+right;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.brandbar'),function(el){el.innerHTML=bb;});
+
+  var html=SC[S.screen].f();
+  if(!S.cuenta && S.screen!=='login') html+='<div class="pby">powered by <b>Rentsody</b></div>';
+  document.getElementById('screen').innerHTML = html;
+  document.getElementById('dscreen').innerHTML = sidenav()+'<div class="dcontent"><div class="inner">'+html+'</div></div>';
+  document.getElementById('screen').scrollTop = 0;
+  document.getElementById('dscreen').scrollTop = 0;
+
+  var idx='',lastG='';
+  ORDER.forEach(function(n){
+    if(SC[n].g!==lastG){lastG=SC[n].g;idx+='<li class="grp">'+lastG+'</li>';}
+    idx+='<li class="'+(S.screen===n?'on':'')+'" onclick="go(\''+n+'\')">'+SC[n].t+'</li>';
+  });
+  document.getElementById('idx').innerHTML=idx;
+
+  var tabs;
+  if(!S.cuenta){tabs=[['home','Inicio']].concat(S.one?[['agente','Asistente']]:[]).concat([['ayuda','Ayuda']]);}
+  else if(S.estancia){tabs=[['home','Inicio']].concat(S.one?[['agente','Asistente']]:[]).concat([['buscador','Explorar'],['perfil','Cuenta']]);}
+  else{tabs=[['buscador','Explorar'],['misviajes','Mis viajes'],['perfil','Cuenta']];}
+  var tb='';
+  tabs.forEach(function(t){
+    var on=(S.screen===t[0])?'on':'';
+    tb+='<div class="'+on+'" onclick="go(\''+t[0]+'\')"><span class="ico"></span>'+t[1]+'</div>';
+  });
+  document.getElementById('tabbar').innerHTML=tb;
+
+  var hayEstancia = S.estancia; // sin cuenta siempre hay estancia; con cuenta puede no haberla
+  bindOpts('opt-momento','momento',S.momento, hayEstancia, 'No aplica sin una estancia activa');
+  bindOpts('opt-one','one',S.one?'1':'0', hayEstancia, 'No aplica sin una estancia activa');
+  bindOpts('opt-cuenta','cuenta',S.cuenta?'1':'0', true, '');
+  bindOpts('opt-origen','origen',S.origen, hayEstancia, 'No aplica sin una estancia activa');
+  bindOpts('opt-estancia','estancia',S.estancia?'1':'0', S.cuenta, 'Solo disponible con Login con cuenta');
+}
+
+function bindOpts(id,key,cur,enabled,reason){
+  var el=document.getElementById(id);
+  el.title = enabled ? '' : (reason||'');
+  Array.prototype.forEach.call(el.children,function(b){
+    b.classList.toggle('on',b.dataset.v===cur);
+    b.disabled = !enabled;
+    b.onclick = enabled ? function(){
+      var v=b.dataset.v;
+      if(key==='one'||key==='cuenta'||key==='estancia') S[key]=(v==='1'); else S[key]=v;
+      if(key==='cuenta'){
+        if(!S.cuenta) S.estancia = true; // el enlace del gestor siempre corresponde a una estancia
+        S.screen = (S.cuenta && !S.estancia) ? 'misviajes' : 'home';
+      }
+      render();
+    } : null;
+  });
+}
+
+render();
+</script>
+</body>
+</html>
