@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rentsody Guest: sitemap y userflow</title>
+<style>
+  :root{
+    --ink:#1f2430; --muted:#6b7280; --line:#c9cdd6;
+    --blue:#3DADFF; --blue-bg:#EAF5FF;
+    --green:#4CBF5E; --green-bg:#EAF8EC;
+    --violet:#874FFF; --violet-bg:#F1EAFF;
+    --amber:#E8A302; --amber-bg:#FFF4D6;
+    --red:#E05B4B; --red-bg:#FDEBE8;
+    --gray:#9AA0AC; --gray-bg:#F4F5F7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:#fbfbfc;padding:0 24px 60px;}
+  .wrap{max-width:1180px;margin:0 auto;}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  h1{font-size:30px;font-weight:700;margin:6px 0 4px;}
+  .sub{color:var(--muted);font-size:14px;max-width:800px;line-height:1.5;}
+
+  /* Tabs */
+  .tabs{position:sticky;top:0;background:#fbfbfc;padding:18px 0 14px;margin-bottom:26px;border-bottom:1px solid var(--line);display:flex;gap:8px;z-index:10;}
+  .tab{
+    border:1px solid var(--line);background:#fff;border-radius:999px;
+    padding:9px 22px;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted);
+  }
+  .tab.active{background:var(--ink);border-color:var(--ink);color:#fff;}
+
+  .page{display:none;}
+  .page.visible{display:block;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin:22px 0 30px;font-size:12.5px;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
+  .sw{width:14px;height:14px;border-radius:4px;display:inline-block;border:1px solid var(--line);}
+
+  /* ====== SITEMAP ====== */
+  .entries{display:flex;flex-wrap:wrap;gap:18px;justify-content:center;margin-bottom:8px;}
+  .entry{background:#fff;border:1.5px solid var(--ink);border-radius:999px;padding:12px 22px;text-align:center;min-width:250px;}
+  .entry b{display:block;font-size:15px;}
+  .entry small{color:var(--muted);font-size:12px;line-height:1.4;display:block;margin-top:2px;}
+  .downlinks{display:flex;justify-content:center;gap:120px;margin:2px 0 6px;color:var(--line);}
+  .downlinks div{font-size:20px;line-height:1;}
+
+  .blocks{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:20px;align-items:start;}
+  @media (max-width:900px){.blocks{grid-template-columns:1fr;}}
+  .block{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .block-head{padding:12px 16px;font-weight:700;font-size:14.5px;display:flex;align-items:baseline;gap:8px;}
+  .block-head small{font-weight:500;font-size:11.5px;opacity:.75;}
+  .bA .block-head{background:var(--blue-bg);border-bottom:2px solid var(--blue);}
+  .bB .block-head{background:var(--green-bg);border-bottom:2px solid var(--green);}
+  .bC .block-head{background:var(--violet-bg);border-bottom:2px solid var(--violet);}
+  .block-body{padding:14px 16px 18px;}
+  .block-note{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.45;}
+
+  ul.tree{list-style:none;}
+  ul.tree > li{position:relative;}
+  .node{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:13.5px;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .node.parent{font-weight:700;border-width:1.5px;}
+  .bA .node.parent{border-color:var(--blue);background:var(--blue-bg);}
+  .bB .node.parent{border-color:var(--green);background:var(--green-bg);}
+  .bC .node.parent{border-color:var(--violet);background:var(--violet-bg);}
+  ul.children{list-style:none;margin-left:14px;padding-left:16px;border-left:2px solid var(--line);}
+  ul.children > li{position:relative;}
+  ul.children > li::before{content:"";position:absolute;left:-16px;top:16px;width:12px;height:2px;background:var(--line);}
+  .node small{color:var(--muted);font-weight:400;font-size:11.5px;flex-basis:100%;line-height:1.35;}
+
+  .tag{font-size:10.5px;font-weight:600;border-radius:999px;padding:2px 8px;white-space:nowrap;}
+  .tag.one{background:var(--amber-bg);color:#8a6100;border:1px solid var(--amber);}
+  .tag.momento{background:var(--gray-bg);color:#454b57;border:1px solid var(--gray);}
+  .tag.legal{background:#FFE4EC;color:#a1275a;border:1px solid #F27FA5;}
+  .tag.fase{background:#EDF0F4;color:#4a5568;border:1px dashed #9AA0AC;}
+
+  .relations{margin-top:26px;background:#fff;border:1px dashed var(--line);border-radius:12px;padding:14px 18px;}
+  .relations h3{font-size:13px;margin-bottom:8px;}
+  .relations p{font-size:12.5px;color:var(--muted);line-height:1.6;}
+  .arrow{color:var(--ink);font-weight:600;}
+
+  .transv{margin-top:20px;background:var(--gray-bg);border:1px solid var(--line);border-radius:12px;padding:14px 18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+  .transv b{font-size:13px;margin-right:6px;}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:12.5px;}
+  .transv small{flex-basis:100%;color:var(--muted);font-size:11.5px;}
+
+  /* ====== USERFLOW ====== */
+  .fase{background:#fff;border:1px solid var(--line);border-radius:16px;margin-bottom:26px;overflow:hidden;}
+  .fase-head{padding:11px 18px;font-weight:700;font-size:14px;background:var(--gray-bg);border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:baseline;}
+  .fase-head small{font-weight:500;color:var(--muted);font-size:12px;}
+  .fase-body{padding:18px;}
+
+  .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media(max-width:860px){.cols{grid-template-columns:1fr;}}
+  .col{border:1px dashed var(--line);border-radius:12px;padding:12px;}
+  .col-title{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+  .col.club-col{border-color:var(--violet);}
+  .col.club-col .col-title{color:var(--violet);}
+
+  .step{border:1px solid var(--line);border-radius:9px;background:#fff;padding:8px 11px;font-size:13px;line-height:1.35;margin-bottom:6px;}
+  .step small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px;line-height:1.35;}
+  .step.sys{background:var(--blue-bg);border-color:var(--blue);}
+  .step.dec{background:var(--amber-bg);border-color:var(--amber);font-weight:600;}
+  .step.club{background:var(--violet-bg);border-color:var(--violet);}
+  .step.alt{background:var(--red-bg);border-color:var(--red);}
+  .step.prop{border-style:dashed;}
+  .tagone{font-size:10.5px;font-weight:600;border-radius:999px;padding:1px 8px;background:var(--amber-bg);border:1px solid var(--amber);color:#8a6100;white-space:nowrap;}
+
+  .darr{text-align:center;color:var(--line);font-size:17px;line-height:1;margin:2px 0 8px;}
+  .branch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 6px;}
+  .branch-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+
+  .converge{margin-top:16px;background:var(--blue-bg);border:2px solid var(--blue);border-radius:12px;padding:13px 18px;text-align:center;font-size:13.5px;font-weight:600;}
+  .converge small{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:3px;}
+
+  .inline{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;}
+  .inline .step{margin-bottom:0;flex:1;min-width:160px;}
+  .loop{margin-top:8px;text-align:center;font-size:12.5px;color:var(--violet);font-weight:600;}
+
+  /* ====== DETALLE DE SECCIONES ====== */
+  .grupo{margin-bottom:34px;}
+  .grupo-head{font-size:16px;font-weight:700;padding:10px 16px;border-radius:10px;margin-bottom:14px;display:flex;gap:10px;align-items:baseline;}
+  .grupo-head small{font-weight:500;font-size:12px;opacity:.8;}
+  .grupo.gA .grupo-head{background:var(--blue-bg);border-left:4px solid var(--blue);}
+  .grupo.gB .grupo-head{background:var(--green-bg);border-left:4px solid var(--green);}
+  .grupo.gC .grupo-head{background:var(--violet-bg);border-left:4px solid var(--violet);}
+  .grupo.gT .grupo-head{background:var(--gray-bg);border-left:4px solid var(--gray);}
+  .det{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:12px;}
+  .det h3{font-size:14.5px;margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .det p{font-size:13px;line-height:1.55;color:var(--ink);margin-bottom:8px;}
+  .det p:last-child{margin-bottom:0;}
+  .det b.lbl{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="tabs">
+    <button class="tab active" data-page="sitemap">Sitemap</button>
+    <button class="tab" data-page="userflow">Userflow de Alba</button>
+    <button class="tab" data-page="detalle">Detalle de secciones</button>
+  </div>
+
+  <!-- ================= PÁGINA 1: SITEMAP ================= -->
+  <div class="page visible" id="page-sitemap">
+
+    <div class="kicker">3.1 Arquitectura de la información</div>
+    <h1>Sitemap Rentsody Guest</h1>
+    <p class="sub">Dos puntos de entrada con su propia navegación y marca. El enlace de la reserva abre solo la estancia, con el logo del gestor y las secciones Inicio, Asistente y Ayuda. El acceso con cuenta abre la app completa Rentsody Guest: Inicio, Asistente, Explorar y Cuenta, con Mis viajes dentro de Cuenta. El asistente requiere Rentsody One en ambos flujos.</p>
+
+    <div class="legend">
+      <span><span class="dot" style="background:var(--blue)"></span> A. Buscador de la red (solo con cuenta)</span>
+      <span><span class="dot" style="background:var(--green)"></span> B. Mi estancia</span>
+      <span><span class="dot" style="background:var(--violet)"></span> C. Cuenta (opcional)</span>
+      <span><span class="dot" style="background:var(--amber)"></span> Solo con Rentsody One</span>
+      <span><span class="dot" style="background:var(--gray)"></span> Cambia según el momento del viaje</span>
+      <span><span class="dot" style="background:#EDF0F4;border:1px dashed #9AA0AC"></span> Evolución posterior según el documento funcional</span>
+    </div>
+
+    <div class="entries">
+      <div class="entry">
+        <b>Login o registro</b>
+        <small>Abre la cuenta, el buscador<br>de la red y las estancias del viajero</small>
+      </div>
+      <div class="entry">
+        <b>Enlace de la reserva</b>
+        <small>Lo envía Rentals al confirmarse la reserva,<br>venga de una OTA, de la web directa del gestor<br>o del buscador. Acceso directo a la estancia, sin cuenta</small>
+      </div>
+    </div>
+    <div class="downlinks"><div>&#8595;</div><div>&#8595;</div></div>
+
+    <div class="blocks">
+
+      <div class="block bA">
+        <div class="block-head">A. Buscador de la red <small>embebido, solo con cuenta</small></div>
+        <div class="block-body">
+          <p class="block-note">Buscador dentro de Rentsody Guest para huéspedes con cuenta. Cada alojamiento aparece solo si el host activa su inclusión desde su configuración (ajuste que vive en el backoffice, fuera del alcance de Guest). Los alojamientos se muestran con marca neutral de Rentsody (propuesta pendiente de decisión). El documento funcional lo recoge como pantalla propia y sitúa su versión completa como evolución posterior.</p>
+          <ul class="tree">
+            <li>
+              <div class="node parent">Alojamientos de la red <span class="tag fase">versión completa: evolución posterior</span></div>
+              <ul class="children">
+                <li><div class="node">Listado y búsqueda <small>destino, fechas y viajeros; resultados como tarjetas clicables con valoración de la red y precio total para las fechas</small></div></li>
+                <li>
+                  <div class="node">Ficha de alojamiento <small>marca neutral Rentsody; contenido servido por el inventario de Rentals, con la misma estructura que la web powered by del gestor</small></div>
+                  <ul class="children">
+                    <li><div class="node">Galería de fotos <small>índice visual por espacios de la vivienda, con las fotos etiquetadas</small></div></li>
+                    <li><div class="node">Características principales <small>tipo, superficie, huéspedes, dormitorios y baños</small></div></li>
+                    <li><div class="node">Sobre este alojamiento <small>descripción y número de registro (NRA)</small></div></li>
+                    <li><div class="node">Servicios incluidos y ubicación <small>con la dirección exacta visible antes de reservar</small></div></li>
+                    <li><div class="node">Preguntas frecuentes <small>horarios, mascotas, aparcamiento, cancelación e instrucciones de llegada</small></div></li>
+                    <li>
+                      <div class="node">Confirmar reserva <small>la disponibilidad se consulta contra el calendario de Rentals, que al confirmar bloquea las fechas en todos los canales</small></div>
+                      <ul class="children">
+                        <li><div class="node">Resumen y desglose <small>fechas, viajeros, precio total y opción de aplicar Rewards como descuento</small></div></li>
+                        <li><div class="node">Datos de contacto <small>precargados de la cuenta, con peticiones especiales y horas de llegada y salida</small></div></li>
+                        <li><div class="node">Pago <small>Redsys o Stripe, con términos y política de cancelación. En reserva bajo petición, el pago llega tras la aceptación del host, que puede revisar el perfil de confianza</small></div></li>
+                        <li><div class="node">Confirmación <small>crea la estancia en el bloque B y envía el enlace</small></div></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="block bB">
+        <div class="block-head">B. Mi estancia <small>por enlace o desde la cuenta</small></div>
+        <div class="block-body">
+          <ul class="tree">
+            <li>
+              <div class="node parent">Home de la estancia <span class="tag momento">según momento</span>
+                <small>Antes de llegar prioriza el check-in, durante la estancia la guía y la ayuda, al final el check-out</small>
+              </div>
+              <ul class="children">
+                <li><div class="node">Asistente <span class="tag one">solo con Rentsody One</span> <small>apartado propio al nivel de Inicio, en la navegación de ambos flujos; chat con enlaces a los apartados y modo de conversación por voz</small></div></li>
+                <li><div class="node">Mi reserva <small>fechas, alojamiento, canal de reserva y grupo de viajeros</small></div></li>
+                <li><div class="node">Check-in online <span class="tag legal">requisito legal</span> <small>registro por viajero con invitaciones por WhatsApp o email y envío único del grupo; escaneo OCR para registrados: evolución posterior</small></div></li>
+                <li><div class="node">Llegada y acceso <small>dirección, entrada, wifi y llave digital: abrir puerta con One o ver el código de acceso</small></div></li>
+                <li><div class="node">Vivienda: panel de control <span class="tag one">solo con Rentsody One</span> <small>luces, clima dentro de un rango, persianas, alarma y escenas explicadas</small></div></li>
+                <li><div class="node">Guía del alojamiento <small>normas, equipamiento, recomendaciones con origen etiquetado</small></div></li>
+                <li><div class="node">Servicios <small>solicitudes con sus seis estados y catálogo; pago al solicitar con Redsys o Stripe; experiencias locales: evolución posterior</small></div></li>
+                <li><div class="node">Rewards <small>objetivos de la estancia y progreso; los puntos se confirman tras el check-out</small></div></li>
+                <li><div class="node">Ayuda <small>escribir o llamar al gestor, no puedo entrar y comunicar incidencia</small></div></li>
+                <li><div class="node">Check-out <small>instrucciones de salida, confirmación disponible el día de la salida y valoración según canal</small></div></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="block bC">
+        <div class="block-head">C. Cuenta <small>opcional, con registro</small></div>
+        <div class="block-body">
+          <p class="block-note">La cuenta es opcional y conecta con los otros dos bloques: desde ella se abren las estancias del viajero, y solo los viajeros registrados pueden usar el buscador de la red.</p>
+          <ul class="tree">
+            <li>
+              <div class="node parent">Cuenta del viajero</div>
+              <ul class="children">
+                <li><div class="node">Mis viajes <small>próximas reservas, estancia activa e histórico; el detalle de cada viaje permite volver a reservar. Con estancia activa se abre desde Cuenta; sin estancia tiene pestaña propia</small></div></li>
+                <li><div class="node">Rentsody Rewards <small>puntos, ventajas y beneficios; saldo de red y liquidación entre gestores: evolución posterior</small></div></li>
+                <li><div class="node">Perfil de confianza <small>señales verificadas de estancias anteriores, con desglose y opción de revisión; compartido entre gestores: evolución posterior</small></div></li>
+                <li><div class="node">Mis datos <small>información personal, permisos y privacidad</small></div></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="relations">
+      <h3>Relaciones entre bloques</h3>
+      <p>
+        Crear cuenta (bloque C) <span class="arrow">&#8594;</span> desbloquea el buscador de la red (bloque A).<br>
+        Reserva confirmada en el bloque A <span class="arrow">&#8594;</span> crea una estancia en el bloque B.<br>
+        Mis viajes en el bloque C <span class="arrow">&#8594;</span> abre la estancia activa del bloque B.<br>
+        Login con estancia activa <span class="arrow">&#8594;</span> aterriza en el Inicio de la estancia; sin estancia, en Mis viajes.<br>
+        Enlace de la reserva <span class="arrow">&#8594;</span> entra al bloque B sin pasar por login, sea cual sea el canal de la reserva: OTA, web directa del gestor o buscador de la red. La web directa (SSR) queda fuera de este sitemap por ser un producto propio conectado a Rentals.
+      </p>
+    </div>
+
+    <div class="transv">
+      <b>Transversales</b>
+      <span class="chip">Idioma</span>
+      <span class="chip">Privacidad y legal</span>
+      <span class="chip">Notificaciones y canal de avisos</span>
+      <small>Disponibles desde cualquier punto de la app. Las notificaciones viven en la campana de la cabecera y desde ellas se elige el canal de avisos (email o WhatsApp).</small>
+    </div>
+
+  </div>
+
+  <!-- ================= PÁGINA 2: USERFLOW ================= -->
+  <div class="page" id="page-userflow">
+
+    <div class="kicker">3.2 Userflow</div>
+    <h1>El recorrido de Alba, con todas las rutas</h1>
+    <p class="sub">Flujo completo desde la reserva hasta la siguiente estancia: los tres canales de origen, los dos modos de reserva, las bifurcaciones de cuenta y de Rentsody One, los estados alternativos y el cierre del ciclo en el club.</p>
+
+    <div class="legend">
+      <span><span class="sw" style="background:#fff"></span> Acción de Alba</span>
+      <span><span class="sw" style="background:var(--blue-bg);border-color:var(--blue)"></span> Acción del sistema</span>
+      <span><span class="sw" style="background:var(--amber-bg);border-color:var(--amber)"></span> Decisión</span>
+      <span><span class="sw" style="background:var(--red-bg);border-color:var(--red)"></span> Ruta alternativa o de error</span>
+      <span><span class="sw" style="background:var(--violet-bg);border-color:var(--violet)"></span> Ciclo del club</span>
+    </div>
+
+    <!-- FASE 1 -->
+    <div class="fase">
+      <div class="fase-head">1. Descubrimiento y reserva <small>tres canales posibles y todos terminan en Rentals</small></div>
+      <div class="fase-body">
+        <div class="cols">
+          <div class="col">
+            <div class="col-title">Ruta OTA (primera vez)</div>
+            <div class="step">Alba descubre Mojácar Dream en Airbnb</div>
+            <div class="darr">&#8595;</div>
+            <div class="step">Reserva y paga dentro de la propia OTA</div>
+            <div class="darr">&#8595;</div>
+            <div class="step sys">La reserva llega automáticamente a Rentals a través de la conexión con la OTA</div>
+          </div>
+          <div class="col">
+            <div class="col-title">Ruta web directa del gestor</div>
+            <div class="step">Alba entra en la web de Mojácar Dream (powered by Rentsody)</div>
+            <div class="darr">&#8595;</div>
+            <div class="step">Elige alojamiento y fechas</div>
+            <div class="darr">&#8595;</div>
+            <div class="step dec">¿Reserva instantánea o bajo petición?</div>
+            <div class="branch">
+              <div>
+                <div class="branch-label">Instantánea</div>
+                <div class="step">Alba paga y la reserva queda confirmada al momento</div>
+              </div>
+              <div>
+                <div class="branch-label">Bajo petición</div>
+                <div class="step">Envía la solicitud de reserva</div>
+                <div class="step sys">El gestor revisa la solicitud antes de aceptarla</div>
+                <div class="step dec">¿La acepta?</div>
+                <div class="step">Sí: Alba paga y la reserva se confirma</div>
+                <div class="step alt">No: Alba recibe un aviso y la reserva no se realiza</div>
+              </div>
+            </div>
+          </div>
+          <div class="col club-col">
+            <div class="col-title">Ruta buscador de la red (cuando repite, con cuenta)</div>
+            <div class="step club">Alba entra en Guest con su cuenta y abre el buscador</div>
+            <div class="darr">&#8595;</div>
+            <div class="step">Busca por destino, fechas y viajeros; la disponibilidad se comprueba en el calendario de Rentals</div>
+            <div class="darr">&#8595;</div>
+            <div class="step club">Compara resultados con valoraciones de la red y precio total, y abre una ficha (marca neutral, con galería por espacios, dirección exacta y preguntas frecuentes)</div>
+            <div class="darr">&#8595;</div>
+            <div class="step dec">¿Instantánea o bajo petición?</div>
+            <div class="darr">&#8595;</div>
+            <div class="step club">Confirma la reserva: revisa el resumen y sus datos de contacto, aplica sus Rewards como descuento y paga con Redsys o Stripe. Si es bajo petición, envía la solicitud sin cargo y paga tras la aceptación del gestor</div>
+          </div>
+        </div>
+        <div class="converge">
+          Toda reserva confirmada se convierte en una estancia en Rentals
+          <small>Rentals bloquea las fechas en todos los canales y envía a Alba su enlace personal de Guest</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- FASE 2 -->
+    <div class="fase">
+      <div class="fase-head">2. Acceso a Guest <small>sin instalar nada y sin cuenta obligatoria</small></div>
+      <div class="fase-body">
+        <div class="inline">
+          <div class="step">Alba abre el enlace que recibió por correo electrónico</div>
+          <div class="step sys">Guest se abre mostrando su estancia: el alojamiento, las fechas, la siguiente acción y quién la atiende</div>
+        </div>
+        <div class="darr">&#8595;</div>
+        <div class="inline">
+          <div class="step alt">No encuentra el correo con el enlace</div>
+          <div class="step">Lo busca en su bandeja o pide al alojamiento que se lo reenvíe</div>
+          <div class="step club">Si tiene cuenta, inicia sesión y aterriza directamente en el Inicio de su estancia</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FASE 3 -->
+    <div class="fase">
+      <div class="fase-head">3. Check-in del grupo <small>requisito legal, no necesita cuenta</small></div>
+      <div class="fase-body">
+        <div class="inline">
+          <div class="step">Alba ve una tarjeta por viajero con su estado y el progreso del grupo</div>
+          <div class="step">Completa y firma sus propios datos; los menores de 14 años a su cargo van dentro de su mismo formulario</div>
+          <div class="step">Para cada viajero pendiente elige: invitarlo por WhatsApp o email desde la hoja de compartir, o introducir ella sus datos declarando que tiene su permiso</div>
+        </div>
+        <div class="darr">&#8595;</div>
+        <div class="inline">
+          <div class="step">Cada adulto invitado completa y firma su propio registro, sin que Alba vea su documentación. De 14 a 17 años se les invita como a un adulto</div>
+          <div class="step sys">Todo se guarda como borrador automáticamente; el estado se muestra con palabras sencillas: pendiente, invitado, en progreso, completado o necesita corrección</div>
+        </div>
+        <div class="darr">&#8595;</div>
+        <div class="inline">
+          <div class="step">Los registros del grupo se envían juntos, una sola vez; el botón permanece deshabilitado, con el motivo visible, hasta que todos están completos</div>
+          <div class="step alt">Si un dato necesita corrección, la app lleva a esa persona directamente al campo afectado y conserva todo lo demás</div>
+          <div class="step sys">El check-in solo se muestra como completado cuando Rentals lo confirma</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FASE 4 -->
+    <div class="fase">
+      <div class="fase-head">4. Llegada y acceso <small>la credencial depende del pago y del check-in</small></div>
+      <div class="fase-body">
+        <div class="inline">
+          <div class="step">Alba consulta la dirección, las indicaciones para llegar, el horario de entrada y el wifi, que vive en esta sección</div>
+          <div class="step sys">Su llave digital tiene dos estados: no disponible hasta completar el check-in y el pago, y activa durante la estancia</div>
+          <div class="step sys">La vivienda se prepara antes de su llegada y Guest le muestra "tu alojamiento se está preparando" <span class="tagone">solo con One</span></div>
+        </div>
+        <div class="darr">&#8595;</div>
+        <div class="inline">
+          <div class="step dec">¿Puede entrar?</div>
+          <div class="step">Sí: abre la puerta desde la app <span class="tagone">solo con One</span> o consulta el código de acceso, y comienza su estancia</div>
+          <div class="step alt">No: desde Ayuda, "No puedo entrar" le muestra la alternativa de esa vivienda y le permite llamar de inmediato a una persona</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FASE 5 -->
+    <div class="fase">
+      <div class="fase-head">5. Durante la estancia <small>la Home cambia según el momento</small></div>
+      <div class="fase-body">
+        <div class="inline">
+          <div class="step">Consulta la guía del alojamiento: normas, equipamiento y recomendaciones</div>
+          <div class="step">Solicita un servicio del catálogo y lo paga al solicitarlo (Redsys o Stripe); en Mis solicitudes sigue cada una por su estado, de solicitado a completado, con incidencias y reembolso automático si no se confirma</div>
+          <div class="step">Pide ayuda o comunica una incidencia por el canal directo con el gestor: un solo hilo por reserva</div>
+        </div>
+        <div class="darr">&#8595;</div>
+        <div class="inline">
+          <div class="step">Controla la vivienda desde el panel: luces, clima, persianas, alarma y escenas <span class="tagone">solo con One</span></div>
+          <div class="step">Habla con el asistente, por chat o por voz, desde su apartado propio en la navegación; responde con enlaces a los apartados y deriva a una persona cuando hace falta <span class="tagone">solo con One</span></div>
+          <div class="step">Recibe los avisos en la campana de notificaciones y por su canal preferido, y consulta el progreso de sus Rewards</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FASE 6 -->
+    <div class="fase">
+      <div class="fase-head">6. Checkout y feedback <small>la valoración respeta el canal de la reserva</small></div>
+      <div class="fase-body">
+        <div class="inline">
+          <div class="step">La Home destaca la hora de salida, las instrucciones y las acciones pendientes</div>
+          <div class="step">Alba confirma la salida; el botón se activa el día de la salida y hasta entonces muestra el motivo</div>
+        </div>
+        <div class="darr">&#8595;</div>
+        <div class="inline">
+          <div class="step dec">¿La reserva vino de una OTA?</div>
+          <div class="step">Sí: la valoración se deja en la propia OTA; Guest no le pide otra</div>
+          <div class="step">No: si reservó dentro de la red, puede dejar su valoración en Guest</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FASE 7 -->
+    <div class="fase">
+      <div class="fase-head">7. Después de la estancia: el ciclo del club <small>aquí se decide si Alba vuelve</small></div>
+      <div class="fase-body">
+        <div class="inline">
+          <div class="step dec">¿Tiene cuenta Rentsody?</div>
+          <div class="step club">No: Guest le propone crearla para conservar los Rewards de esta estancia y su historial de viajes</div>
+          <div class="step club">Sí: sus Rewards se confirman tras el checkout y se suman a su saldo</div>
+        </div>
+        <div class="darr">&#8595;</div>
+        <div class="inline">
+          <div class="step club">En Mis viajes queda guardado el detalle de la estancia, con la opción de volver a reservar</div>
+          <div class="step club">Descubre la ventaja de reservar directo: en la web del gestor o en el buscador de la red puede usar sus Rewards como descuento</div>
+        </div>
+        <div class="loop">&#8635; Su siguiente reserva entra por la ruta web directa o por la ruta buscador: el ciclo vuelve a la fase 1 sin pasar por la OTA</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= PÁGINA 3: DETALLE DE SECCIONES ================= -->
+  <div class="page" id="page-detalle">
+
+    <div class="kicker">3.3 Arquitectura de la información</div>
+    <h1>Detalle de secciones</h1>
+    <p class="sub">Cada apartado del sitemap explicado en tres pasos: qué es, qué necesidad de Alba resuelve y cómo lo resolvemos. Todo el comportamiento descrito proviene del documento funcional o de decisiones registradas del equipo.</p>
+
+    <div class="grupo gA">
+      <div class="grupo-head">Bloque A. Buscador de la red <small>solo con cuenta</small></div>
+
+      <div class="det">
+        <h3>Listado y búsqueda</h3>
+        <p><b class="lbl">Qué es</b>El catálogo del club: todos los alojamientos de la red Rentsody cuyo host ha activado su inclusión desde el backoffice.</p>
+        <p><b class="lbl">Qué resuelve</b>Cuando Alba quiere repetir, hoy tiene que volver a Booking o Airbnb y empezar de cero. Aquí encuentra alojamientos de confianza, dentro de la red que ya conoce.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>Buscador embebido en Guest, visible solo para viajeros con cuenta, con un formulario simple de destino, fechas y viajeros. Los resultados son tarjetas clicables enteras, al estilo de la ficha de la web del gestor: foto con la valoración superpuesta, título comercial, descripción breve, capacidad y precio total para las fechas buscadas, sin "desde". Las valoraciones provienen solo de reservas hechas por la red. Los alojamientos se muestran con marca neutral de Rentsody, para que el buscador no compita visualmente con la web propia de cada gestor. La versión completa del buscador está prevista como evolución posterior.</p>
+      </div>
+
+      <div class="det">
+        <h3>Ficha de alojamiento</h3>
+        <p><b class="lbl">Qué es</b>La presentación de cada alojamiento: fotos, descripción, capacidad y habitaciones, equipamiento, ubicación, normas, y disponibilidad con precio.</p>
+        <p><b class="lbl">Qué resuelve</b>Alba viaja en grupo, dos parejas, así que decidir depende de saber cuántos dormitorios hay y qué camas tienen. La ficha le da esa información sin tener que preguntarla.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>El contenido no se crea en Guest: lo sirve el inventario de Rentals, el mismo que alimenta la web directa del gestor, y la ficha replica la estructura de esa web: galería de fotos organizada por espacios de la vivienda (con un índice visual de miniaturas, no etiquetas de texto), características principales, descripción con el número de registro (NRA), servicios incluidos, ubicación con la dirección exacta visible antes de reservar (decisión de confianza: aquí el gestor da la cara y la vivienda no se esconde) y preguntas frecuentes. Cierra con el precio total para las fechas y la ventaja de la red: los puntos del viajero como descuento.</p>
+      </div>
+
+      <div class="det">
+        <h3>Confirmar reserva</h3>
+        <p><b class="lbl">Qué es</b>La pantalla de reserva dentro de Guest, con la misma estructura que la de la web del gestor: resumen, datos de contacto, pago y confirmación.</p>
+        <p><b class="lbl">Qué resuelve</b>Que repetir dentro de la red sea tan fácil como reservar en una OTA, con la diferencia de que aquí sus puntos valen dinero.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>La pantalla sigue el guion de la web powered by: resumen de la reserva con foto, fechas, viajeros y desglose (alojamiento, limpieza, impuestos y descuento Rewards antes del total), datos de contacto precargados de la cuenta y editables para la reserva, peticiones especiales y horas aproximadas de llegada y salida, y método de pago con Redsys o Stripe más la aceptación de términos y política de cancelación. La disponibilidad se comprueba contra el calendario de Rentals, la única fuente de verdad: al confirmarse, Rentals bloquea las fechas en todos los canales. Hay dos modos según el alojamiento: reserva instantánea (paga y queda confirmada) y bajo petición (envía la solicitud sin ningún cargo y paga cuando el gestor acepta). La confirmación crea la estancia y dispara el envío del enlace.</p>
+      </div>
+    </div>
+
+    <div class="grupo gB">
+      <div class="grupo-head">Bloque B. Mi estancia <small>por enlace o desde la cuenta</small></div>
+
+      <div class="det">
+        <h3>Home de la estancia <span class="tag momento">según momento</span></h3>
+        <p><b class="lbl">Qué es</b>La pantalla principal de la estancia. No es un menú con todo al mismo peso: es una vista contextual con un bloque de "siguiente acción" arriba y accesos claros al resto de secciones debajo.</p>
+        <p><b class="lbl">Qué resuelve</b>Que Alba no tenga que averiguar qué toca hacer en cada momento. La app se lo dice.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>La Home cambia con el momento del viaje. Antes de llegar prioriza el check-in; durante la estancia, la llave digital como bloque propio (abrir puerta con One o ver el código) con Llegada y acceso como sección aparte; al acercarse la salida, el check-out. Los bloques siguen una regla fija: los de proceso (check-in, llegada) muestran su estado, porque el estado es la información útil, y los de sección (Vivienda, Servicios, Rewards, Guía, Ayuda, Mi reserva, Check-out) describen qué ofrecen, sin datos que ya viven dentro. Con cuenta y estancia activa, la Home muestra además la identidad del gestor con su logo; con cuenta y sin estancia, propone explorar la red y da acceso descriptivo a Mis viajes y Rewards. No todas las secciones se muestran siempre: dependen de la vivienda, del momento y de las capacidades activadas.</p>
+      </div>
+
+      <div class="det">
+        <h3>Mi reserva</h3>
+        <p><b class="lbl">Qué es</b>El resumen de consulta de la reserva: alojamiento, fechas, estado, canal de reserva y grupo de viajeros.</p>
+        <p><b class="lbl">Qué resuelve</b>La información que hoy Alba busca releyendo correos.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>Es una pantalla de consulta pura: qué alojamiento, en qué fechas, en qué estado, por qué canal se reservó y cómo va el registro de cada viajero del grupo. Las preferencias que antes vivían aquí, como el canal de avisos, se movieron a Notificaciones: en Mi reserva solo hay datos de la reserva.</p>
+      </div>
+
+      <div class="det">
+        <h3>Check-in online <span class="tag legal">requisito legal</span></h3>
+        <p><b class="lbl">Qué es</b>El registro de viajeros que exige la normativa española, trasladado del backoffice a una experiencia pensada para el grupo.</p>
+        <p><b class="lbl">Qué resuelve</b>La frustración mayor de Alba: perseguir a todo el grupo para reunir documentos y copiar datos ella sola.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>La reserva solo conoce al titular y el número de viajeros; el resto son plazas por completar, una tarjeta por viajero con su estado en la esquina. Para cada plaza, Alba elige entre invitar (por WhatsApp o email desde una hoja de compartir, o copiando el enlace) o añadir ella los datos, declarando que cuenta con el permiso de esa persona. Cada adulto completa y firma su propio registro; los menores de 14 años van dentro del formulario de su adulto responsable, con parentesco y documento opcional, y de 14 a 17 se les invita como a un adulto. Los formularios cubren los campos del registro oficial de viajeros (RD 933/2021), se adaptan al tipo de documento (DNI/NIE o pasaporte) y se guardan como borrador automáticamente. El envío al registro es único, para todo el grupo: el botón queda deshabilitado, con el motivo visible, hasta que todos los registros están completos, y el check-in solo aparece completado cuando el sistema de origen lo confirma. Si un dato necesita corrección, la app lleva a esa persona al campo exacto y conserva todo lo demás. Alba nunca ve los documentos ni datos sensibles de otro adulto. En una etapa posterior, los usuarios registrados podrán escanear su documento con OCR, siempre con revisión antes del envío.</p>
+      </div>
+
+      <div class="det">
+        <h3>Llegada y acceso</h3>
+        <p><b class="lbl">Qué es</b>Todo lo necesario para llegar y entrar: dirección y mapa, indicaciones, horario de entrada, instrucciones del edificio, wifi y llave digital.</p>
+        <p><b class="lbl">Qué resuelve</b>La incertidumbre de no saber cómo se entra al alojamiento, que hoy se resuelve con mensajes de última hora. Y la pregunta más repetida de todas, la clave del wifi, que vive aquí y solo aquí, con revelado directo al tocarla.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>La dirección se muestra al confirmarse la reserva; las instrucciones sensibles y la llave se liberan cuando se cumplen las condiciones configuradas, como el pago y el check-in. La llave digital tiene dos estados: no disponible, con el motivo y el acceso directo a completar el check-in, y activa, con dos acciones del mismo peso visual: abrir la puerta desde la app (solo con One) o ver el código de acceso, revelado en la propia tarjeta. Si el acceso digital falla, "No puedo entrar" vive en Ayuda: muestra la alternativa configurada para esa vivienda y permite llamar de inmediato a una persona. Ninguna vivienda depende solo del acceso digital.</p>
+      </div>
+
+      <div class="det">
+        <h3>Vivienda: panel de control <span class="tag one">solo con Rentsody One</span></h3>
+        <p><b class="lbl">Qué es</b>El panel visual para controlar la vivienda conectada: luces, temperatura, persianas, alarma y escenas, cada una con una frase que explica qué hace.</p>
+        <p><b class="lbl">Qué resuelve</b>Que la domótica sea una comodidad y no un aparato más que aprender. Hoy cada vivienda con domótica exige su propia app o instrucciones.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>Control real dentro de límites: la temperatura se mueve en el rango que configura el gestor, y la seguridad y la habitabilidad mandan sobre cualquier preferencia (si una ventana queda abierta, la climatización se pausa y se avisa). Antes de la llegada, la vivienda se prepara sola y Guest lo cuenta en una frase: "tu alojamiento se está preparando". Si algo falla, el panel lo explica en lenguaje sencillo y ofrece alternativa; nunca muestra telemetría técnica ni nombres internos de dispositivos. La presencia de sensores se explica antes de la estancia (qué miden, qué no y quién ve el resultado); la monitorización de ruido no guarda audio y ninguna alerta aislada se convierte sola en una acusación.</p>
+      </div>
+
+      <div class="det">
+        <h3>Asistente <span class="tag one">solo con Rentsody One</span></h3>
+        <p><b class="lbl">Qué es</b>El asistente de IA de la estancia, con apartado propio al nivel de Inicio en la navegación de ambos flujos. No es un chatbot aislado: conoce la reserva, la vivienda, la guía y los servicios contratados.</p>
+        <p><b class="lbl">Qué resuelve</b>Las dudas pequeñas que hoy acaban en un WhatsApp al gestor y en una espera.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>Tiene pestaña propia: en el flujo del enlace junto a Inicio y Ayuda, y en el flujo con cuenta junto a Inicio, Explorar y Cuenta (para hacerle sitio sin saturar la barra, Mis viajes se abre desde Cuenta). Se usa por chat o por voz: el modo voz es una conversación continua, tipo llamada, que se puede interrumpir y queda transcrita en el chat. Sus respuestas incluyen enlaces directos a los apartados de la app. Mantiene límites claros: no toca reservas, pagos, accesos ampliados ni datos de identidad, toda acción con coste requiere confirmación expresa, y si Alba pide hablar con una persona, no puede entrar o hay una emergencia, la conversación se escala de inmediato a un humano con todo el contexto. La ejecución completa de acciones es evolución posterior.</p>
+      </div>
+
+      <div class="det">
+        <h3>Guía del alojamiento</h3>
+        <p><b class="lbl">Qué es</b>El manual de la vivienda y del entorno: normas, equipamiento, residuos, aparcamiento, zonas comunes, recomendaciones de la zona, contactos útiles e instrucciones de salida. El wifi no está aquí: vive en Llegada y acceso, una sola puerta para ese dato.</p>
+        <p><b class="lbl">Qué resuelve</b>Los PDFs dispersos y los mensajes repetitivos que hoy acompañan cada estancia.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>El gestor mantiene y aprueba el contenido; Rentsody puede ayudar a estructurarlo y detectar huecos, pero nada se publica solo. Las recomendaciones llevan su origen etiquetado: elegida por el gestor, externa, sugerencia personalizada o contenido con comisión. Lo patrocinado nunca se disfraza de consejo neutral.</p>
+      </div>
+
+      <div class="det">
+        <h3>Servicios</h3>
+        <p><b class="lbl">Qué es</b>La sección de servicios de la estancia, con dos pestañas: Mis solicitudes, el seguimiento de lo pedido, y Catálogo, en tres familias: servicios del alojamiento, llegada y comodidad, y mejoras de la estancia. Las experiencias locales quedan como evolución posterior.</p>
+        <p><b class="lbl">Qué resuelve</b>Contratar algo sin buscar un teléfono ni escribir varios mensajes, y saber en qué estado está lo pedido.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>Cada servicio del catálogo muestra su precio con impuestos, quién lo vende y quién lo presta, un botón de solicitar y otro de ver detalles, que abre un modal con fotos y descripción. El pago se hace al solicitar, eligiendo entre Redsys y Stripe con tarjetas seleccionables, aceptación de términos y una promesa honesta: si el servicio no se confirma, el reembolso es automático. En Mis solicitudes cada servicio recorre seis estados posibles: solicitado, confirmado, en preparación (con seguimiento por pasos cuando implica trabajo físico, que Rentsody Service ejecuta y documenta), completado, con incidencia (con acceso directo a resolverla con el gestor, con contexto) y no confirmado, con el reembolso emitido. Las ofertas aparecen en momentos útiles, nunca mientras Alba intenta resolver un problema.</p>
+      </div>
+
+      <div class="det">
+        <h3>Rewards de la estancia</h3>
+        <p><b class="lbl">Qué es</b>Los objetivos y el progreso de Rewards durante la estancia: consumo razonable, reciclaje, cuidado de la vivienda, convivencia.</p>
+        <p><b class="lbl">Qué resuelve</b>Dar un motivo tangible para las buenas prácticas y para volver, sin convertir la estancia en un examen.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>Objetivos sencillos y progreso visible, sin vigilancia ni culpabilización. Los puntos se confirman después del checkout, cuando la información está consolidada, y se convierten en ventajas: descuentos en futuras reservas, servicios o beneficios del gestor. Guest nunca muestra cifras de ahorro o impacto ambiental que no pueda justificar con una medición real.</p>
+      </div>
+
+      <div class="det">
+        <h3>Ayuda</h3>
+        <p><b class="lbl">Qué es</b>El canal directo con el gestor: dudas, avisos e incidencias, con escalado a una persona siempre disponible.</p>
+        <p><b class="lbl">Qué resuelve</b>Hoy cualquier problema depende de encontrar un número y esperar respuesta por WhatsApp, sin saber si el mensaje llegó.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>La sección ofrece dos acciones del mismo peso, escribir al gestor y llamar, y dos accesos directos para problemas: "No puedo entrar", con la alternativa de acceso de la vivienda, y "Comunicar una incidencia", con foto opcional. Guest es el centro pero no el único canal: los avisos pueden llegar por WhatsApp o correo con enlaces al punto exacto de la app. Rentals conserva una única conversación por reserva, identifica el origen de cada mensaje y evita duplicados; cuando Alba llega desde una incidencia, el chat abre con ese contexto. La asistencia humana no es un último recurso escondido: emergencias, reclamaciones o un simple "quiero hablar con alguien" se atienden de inmediato.</p>
+      </div>
+
+      <div class="det">
+        <h3>Check-out</h3>
+        <p><b class="lbl">Qué es</b>El cierre de la estancia: hora e instrucciones de salida, acciones pendientes, confirmación de salida y valoración.</p>
+        <p><b class="lbl">Qué resuelve</b>Salir sin dudas y sin flecos, y convertir el final del viaje en el principio del siguiente.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>La Home destaca la salida cuando se acerca. El botón de confirmar salida está deshabilitado hasta el día de la salida, con el motivo visible, siguiendo la regla de la app: un botón inactivo siempre explica por qué. Alba confirma la salida, puede comunicar una incidencia y valorar la experiencia: si reservó en una OTA, la valoración se deja en ese canal y Guest no pide otra; si reservó dentro de la red, la deja en Guest. Tras el cierre se confirman los Rewards y, si no tiene cuenta, es el momento en que Guest le propone crearla para no perderlos.</p>
+      </div>
+    </div>
+
+    <div class="grupo gC">
+      <div class="grupo-head">Bloque C. Cuenta <small>opcional, con registro</small></div>
+
+      <div class="det">
+        <h3>Mis viajes</h3>
+        <p><b class="lbl">Qué es</b>El espacio permanente del viajero registrado: próximas reservas, estancia activa e histórico de viajes en toda la red, aunque fueran con gestores distintos.</p>
+        <p><b class="lbl">Qué resuelve</b>Empezar de cero en cada viaje. Y volver a la app sin buscar el correo: con cuenta, la estancia activa está a un login de distancia.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>Cada viaje pasado guarda alojamiento, fechas, servicios contratados, justificantes disponibles, valoración y Rewards obtenidos, con la opción de volver a reservar el mismo alojamiento o ver propuestas similares. No es un archivo administrativo: es la memoria de viajes de Alba. En la navegación, su lugar depende del contexto: con estancia activa se abre desde Cuenta (la pestaña la ocupa el Asistente) y sin estancia tiene pestaña propia, porque entonces los viajes son el contenido central. El login aterriza en el Inicio de la estancia si hay una activa, y en Mis viajes si no.</p>
+      </div>
+
+      <div class="det">
+        <h3>Rentsody Rewards</h3>
+        <p><b class="lbl">Qué es</b>El saldo de puntos y ventajas del viajero, que le pertenece a él y le acompaña por toda la red.</p>
+        <p><b class="lbl">Qué resuelve</b>Que repetir tenga premio, y que el premio no se quede encerrado en un solo alojamiento.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>Los puntos se ganan con buenas prácticas durante las estancias y se usan como descuentos en futuras reservas, servicios, experiencias o ventajas configuradas por cada gestor. El saldo de red completo, con liquidación entre gestores, es evolución posterior. Rewards se mantiene separado del perfil de confianza y de las valoraciones: reconoce, no puntúa a la persona.</p>
+      </div>
+
+      <div class="det">
+        <h3>Perfil de confianza</h3>
+        <p><b class="lbl">Qué es</b>Un resumen de señales verificadas de estancias anteriores: convivencia, cuidado de la vivienda, cumplimiento de normas.</p>
+        <p><b class="lbl">Qué resuelve</b>Ayuda al viajero que lo hace bien a que le acepten reservas bajo petición, y da contexto al host que recibe una solicitud.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>Con transparencia y sin automatismos. La puntuación solo existe a partir de tres estancias completadas; un huésped nuevo nunca se confunde con uno de puntuación baja. Alba puede consultar el desglose, entender qué hechos influyen y pedir revisión, y mientras un hecho está impugnado no cuenta. La decisión final sobre una reserva siempre es del host, nunca del sistema. Compartido entre gestores: evolución posterior.</p>
+      </div>
+
+      <div class="det">
+        <h3>Mis datos</h3>
+        <p><b class="lbl">Qué es</b>La información personal, los permisos y la privacidad del viajero.</p>
+        <p><b class="lbl">Qué resuelve</b>Saber qué datos son necesarios para la estancia y cuáles son opcionales, y tener el control de los segundos.</p>
+        <p><b class="lbl">Cómo lo resolvemos</b>Los datos necesarios (reserva, viajeros, pago, check-in) se separan de los opcionales (preferencias, marketing, notificaciones, personalización), que se piden uno a uno. Rechazar algo opcional nunca impide completar la estancia. Alba puede consultar, corregir, retirar permisos y borrar o llevarse su información.</p>
+      </div>
+    </div>
+
+    <div class="grupo gT">
+      <div class="grupo-head">Transversales <small>disponibles en toda la app</small></div>
+
+      <div class="det">
+        <h3>Idioma</h3>
+        <p><b class="lbl">Cómo lo resolvemos</b>Cambio manual de idioma, mantenido durante todo el recorrido. Primera cobertura en español e inglés; después francés, alemán, italiano, portugués y neerlandés. Si falta una traducción de contenido crítico, se muestra un aviso con el texto en español o inglés, nunca un hueco.</p>
+      </div>
+
+      <div class="det">
+        <h3>Privacidad y legal</h3>
+        <p><b class="lbl">Cómo lo resolvemos</b>Los textos legales de la aplicación, accesibles desde cualquier punto: aviso legal, política de privacidad, condiciones de la reserva y política de cookies. Desde aquí se llega también a la gestión de permisos y consentimientos, que para viajeros registrados vive en Mis datos.</p>
+      </div>
+
+      <div class="det">
+        <h3>Notificaciones y canal de avisos</h3>
+        <p><b class="lbl">Cómo lo resolvemos</b>Una campana en la cabecera, presente en ambos flujos, abre la lista de avisos: los que requieren algo del viajero aparecen primero y cada aviso lleva a la pantalla donde se resuelve. El contenido depende del momento y del escenario (estancia activa o solo cuenta). Al final de la lista vive la preferencia de canal: el viajero elige si además quiere recibir los avisos por correo o WhatsApp. La preferencia se edita solo aquí; Cuenta enlaza a este punto. Los mensajes externos enlazan al punto exacto de Guest y las acciones sensibles siempre se resuelven dentro de la experiencia autenticada, nunca por WhatsApp.</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  var tabs = document.querySelectorAll('.tab');
+  var pages = document.querySelectorAll('.page');
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      tabs.forEach(function(t){ t.classList.remove('active'); });
+      pages.forEach(function(p){ p.classList.remove('visible'); });
+      tab.classList.add('active');
+      document.getElementById('page-' + tab.dataset.page).classList.add('visible');
+      window.scrollTo(0,0);
+    });
+  });
+</script>
+</body>
+</html>
